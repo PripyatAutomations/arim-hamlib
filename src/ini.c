@@ -495,7 +495,8 @@ void ini_read_tnc_set(FILE *inifp, int which)
     snprintf(g_tnc_settings[which].debug_en, sizeof(g_tnc_settings[which].debug_en), DEFAULT_TNC_DEBUG_EN);
     snprintf(g_tnc_settings[which].traffic_en, sizeof(g_tnc_settings[which].traffic_en),  DEFAULT_TNC_TRAFFIC_EN);
     snprintf(g_tnc_settings[which].tncpi9k6_en, sizeof(g_tnc_settings[which].tncpi9k6_en),  DEFAULT_TNC_TNCPI9K6_EN);
-    g_tnc_settings[which].hamlib_model = DEFAULT_HAMLIB_MODEL;
+//    g_tnc_settings[which].hamlib_model = DEFAULT_HAMLIB_MODEL;
+    g_tnc_settings[which].hamlib_model = -1;
 
     home_path = getenv("HOME");
     if (home_path)
