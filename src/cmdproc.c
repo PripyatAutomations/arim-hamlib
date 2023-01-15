@@ -333,19 +333,14 @@ int cmdproc_cmd(const char *cmd)
         ////////////////////////////
         // hamlib - 20230115
         } else if (!strncasecmp(t, "qsy", 3)) {
-            // parse out tnc #
             t = strtok(NULL, " \t");
             if (!t) {
                break;
             }
-            // find the rig
-            int tnc_id = atoi(t);
-            RIG *rig = g_tnc_settings[tnc_id].hamlib_rig;
-
-            // parse frequency
-            t = strtok(NULL, " \t");
             double freq;
             sscanf(t, "%lf", &freq);
+
+            RIG *rig = g_tnc_settings[g_cur_tnc].hamlib_rig;
             int rc = rig_set_freq(rig, RIG_VFO_A, freq);
             if (rc != RIG_OK) {
                // squawk an error
