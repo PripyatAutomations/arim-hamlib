@@ -1,0 +1,9 @@
+src/*.o
+arim
+Makefile
+config.log
+config.status
+src/.deps/
+src/.dirstamp
+src/config.h
+src/stamp-h1
