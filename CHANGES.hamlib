@@ -1,0 +1,6 @@
+Added qsy command
+	qsy tnc# freq-in-hz
+	Ex:
+		qsy 1 7079000
+
+	Must be attached to the TNC for this to work

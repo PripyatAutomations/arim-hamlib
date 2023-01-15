@@ -1,0 +1,224 @@
+# Themes define color and text attribute assignments for various UI elements
+# in ARIM. The themes defined here augment the built-in DARK and LIGHT themes.
+# The allowable colors are:
+# BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, and WHITE.
+# What you see will vary with the color palette used by your terminal emulator.
+# The allowable text attributes are:
+# BLINK, BOLD, DIM, ITALIC, NORMAL, REVERSE, STANDOUT and UNDERLINE.
+# Not all of these attributes work on a given terminal type; you'll need to
+# experiment with them on your system. Up to 5 themes can be defined.
+# Use 'man 5 arim' to view the ARIM files man page to learn more.
+# Below are themes you can use as is or change to suit your own taste!
+#
+# midnight is similar the built-in DARK theme, adjust to taste.
+[theme]
+name = midnight
+ui-background-color = BLACK
+ui-default-color = WHITE
+ui-default-attr = NORMAL
+ui-status-indicator-color = WHITE
+ui-status-indicator-attr = NORMAL
+ui-status-notify-color = WHITE
+ui-status-notify-attr = BOLD
+ui-dialog-color = BLACK
+ui-dialog-attr = NORMAL
+ui-dialog-background-color = WHITE
+ui-clock-color = WHITE
+ui-clock-attr = NORMAL
+ui-msg-cntr-color = WHITE
+ui-msg-cntr-attr = NORMAL
+ui-ch-busy-color = WHITE
+ui-ch-busy-attr = NORMAL
+ui-title-color = WHITE
+ui-title-attr = NORMAL
+tm-error-color = RED
+tm-error-attr = NORMAL
+tm-message-color = GREEN
+tm-message-attr = NORMAL
+tm-query-color = YELLOW
+tm-query-attr = NORMAL
+tm-ping-color = BLUE
+tm-ping-attr = BOLD
+tm-id-color = BLUE
+tm-id-attr = BOLD
+tm-net-color = CYAN
+tm-net-attr = NORMAL
+tm-beacon-color = MAGENTA
+tm-beacon-attr = NORMAL
+tm-arq-color = WHITE
+tm-arq-attr = NORMAL
+tm-tx-frame-attr = BOLD
+tc-cmd-color = CYAN
+tc-cmd-attr = BOLD
+tc-ptt-true-color = RED
+tc-ptt-true-attr = NORMAL
+tc-ptt-false-color = GREEN
+tc-ptt-false-attr = NORMAL
+tc-buffer-color = YELLOW
+tc-buffer-attr = NORMAL
+tc-ping-color = BLUE
+tc-ping-attr = BOLD
+tc-busy-color = MAGENTA
+tc-busy-attr = NORMAL
+tc-newstate-color = YELLOW
+tc-newstate-attr = NORMAL
+#
+# noon is similar the built-in LIGHT theme, adjust to taste.
+[theme]
+name = noon
+ui-background-color = WHITE
+ui-default-color = BLACK
+ui-default-attr = NORMAL
+ui-status-indicator-color = BLACK
+ui-status-indicator-attr = NORMAL
+ui-status-notify-color = BLACK
+ui-status-notify-attr = BOLD
+ui-dialog-color = BLACK
+ui-dialog-attr = NORMAL
+ui-dialog-background-color = YELLOW
+ui-clock-color = BLACK
+ui-clock-attr = NORMAL
+ui-msg-cntr-color = BLACK
+ui-msg-cntr-attr = NORMAL
+ui-ch-busy-color = BLACK
+ui-ch-busy-attr = NORMAL
+ui-title-color = BLACK
+ui-title-attr = NORMAL
+tm-error-color = RED
+tm-error-attr = NORMAL
+tm-message-color = GREEN
+tm-message-attr = NORMAL
+tm-query-color = YELLOW
+tm-query-attr = NORMAL
+tm-ping-color = BLUE
+tm-ping-attr = BOLD
+tm-id-color = BLUE
+tm-id-attr = BOLD
+tm-net-color = CYAN
+tm-net-attr = NORMAL
+tm-beacon-color = MAGENTA
+tm-beacon-attr = NORMAL
+tm-arq-color = BLACK
+tm-arq-attr = NORMAL
+tm-tx-frame-attr = BOLD
+tc-cmd-color = CYAN
+tc-cmd-attr = BOLD
+tc-ptt-true-color = RED
+tc-ptt-true-attr = NORMAL
+tc-ptt-false-color = GREEN
+tc-ptt-false-attr = NORMAL
+tc-buffer-color = YELLOW
+tc-buffer-attr = NORMAL
+tc-ping-color = BLUE
+tc-ping-attr = BOLD
+tc-busy-color = MAGENTA
+tc-busy-attr = NORMAL
+tc-newstate-color = BLUE
+tc-newstate-attr = NORMAL
+#
+# bluebird is an example custom theme, adjust to taste.
+[theme]
+name = bluebird
+ui-background-color = BLUE
+ui-default-color = WHITE
+ui-default-attr = NORMAL
+ui-status-indicator-color = WHITE
+ui-status-indicator-attr = BOLD
+ui-status-notify-color = WHITE
+ui-status-notify-attr = BOLD
+ui-dialog-color = BLACK
+ui-dialog-attr = NORMAL
+ui-dialog-background-color = YELLOW
+ui-clock-color = WHITE
+ui-clock-attr = NORMAL
+ui-msg-cntr-color = WHITE
+ui-msg-cntr-attr = NORMAL
+ui-ch-busy-color = WHITE
+ui-ch-busy-attr = NORMAL
+ui-title-color = WHITE
+ui-title-attr = NORMAL
+tm-error-color = RED
+tm-error-attr = NORMAL
+tm-message-color = GREEN
+tm-message-attr = NORMAL
+tm-query-color = YELLOW
+tm-query-attr = NORMAL
+tm-ping-color = BLACK
+tm-ping-attr = BOLD
+tm-id-color = BLACK
+tm-id-attr = BOLD
+tm-net-color = CYAN
+tm-net-attr = NORMAL
+tm-beacon-color = MAGENTA
+tm-beacon-attr = NORMAL
+tm-arq-color = WHITE
+tm-arq-attr = NORMAL
+tm-tx-frame-attr = BOLD
+tc-cmd-color = CYAN
+tc-cmd-attr = BOLD
+tc-ptt-true-color = RED
+tc-ptt-true-attr = NORMAL
+tc-ptt-false-color = GREEN
+tc-ptt-false-attr = NORMAL
+tc-buffer-color = YELLOW
+tc-buffer-attr = NORMAL
+tc-ping-color = BLACK
+tc-ping-attr = BOLD
+tc-busy-color = MAGENTA
+tc-busy-attr = NORMAL
+tc-newstate-color = YELLOW
+tc-newstate-attr = NORMAL
+#
+# sunshine is an example custom theme, adjust to taste.
+[theme]
+name = sunshine
+ui-background-color = YELLOW
+ui-default-color = BLACK
+ui-default-attr = NORMAL
+ui-status-indicator-color = BLACK
+ui-status-indicator-attr = NORMAL
+ui-status-notify-color = BLACK
+ui-status-notify-attr = BOLD
+ui-dialog-color = WHITE
+ui-dialog-attr = NORMAL
+ui-dialog-background-color = BLUE
+ui-clock-color = BLACK
+ui-clock-attr = NORMAL
+ui-msg-cntr-color = BLACK
+ui-msg-cntr-attr = NORMAL
+ui-ch-busy-color = BLACK
+ui-ch-busy-attr = NORMAL
+ui-title-color = BLACK
+ui-title-attr = NORMAL
+tm-error-color = RED
+tm-error-attr = NORMAL
+tm-message-color = GREEN
+tm-message-attr = NORMAL
+tm-query-color = WHITE
+tm-query-attr = NORMAL
+tm-ping-color = BLUE
+tm-ping-attr = BOLD
+tm-id-color = BLUE
+tm-id-attr = BOLD
+tm-net-color = CYAN
+tm-net-attr = NORMAL
+tm-beacon-color = MAGENTA
+tm-beacon-attr = NORMAL
+tm-arq-color = WHITE
+tm-arq-attr = NORMAL
+tm-tx-frame-attr = BOLD
+tc-cmd-color = CYAN
+tc-cmd-attr = BOLD
+tc-ptt-true-color = RED
+tc-ptt-true-attr = NORMAL
+tc-ptt-false-color = GREEN
+tc-ptt-false-attr = NORMAL
+tc-buffer-color = WHITE
+tc-buffer-attr = NORMAL
+tc-ping-color = BLUE
+tc-ping-attr = BOLD
+tc-busy-color = MAGENTA
+tc-busy-attr = NORMAL
+tc-newstate-color = BLUE
+tc-newstate-attr = NORMAL
+

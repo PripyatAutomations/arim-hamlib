@@ -1,0 +1,7 @@
+This is a test file. It can be used to demonstrate the "send file"
+feature. This is a relatively short file. The maximum file size for
+ARIM transfers is set by the max-file-size parameter in the [arim]
+section of the arim.ini file.
+73,
+NW8L
+

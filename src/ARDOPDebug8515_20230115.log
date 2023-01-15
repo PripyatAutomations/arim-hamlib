@@ -1,0 +1,65 @@
+05:22:07.030 ARDOPC Version 2.0.3.8-BPQ
+05:22:07.031 ARDOPC listening on port 8515
+05:22:07.031 getReadDevices
+05:22:07.036 Card 0, ID `Device', name `USB Audio Device'
+05:22:07.036   Device 0, ID `USB Audio', name `USB Audio', 1 subdevices (1 available)
+05:22:07.036     1 channel, 
+05:22:07.036 sampling rate 44100..48000 Hz
+05:22:07.036 hw:0,0 USB Audio(USB Audio Device)
+05:22:07.038 getWriteDevices
+05:22:07.038 Card 0, ID `Device', name `USB Audio Device'
+05:22:07.038   Device 0, ID `USB Audio', name `USB Audio', 1 subdevices (1 available)
+05:22:07.038     2 channels, 
+05:22:07.038 sampling rate 44100..48000 Hz
+05:22:07.038 hw:0,0 USB Audio(USB Audio Device)
+05:22:07.039 Opening Playback Device ARDOP Rate 12000
+05:22:07.047 Playback Buffer Size 65536
+05:22:07.055 Opening Capture Device ARDOP Rate 12000
+05:22:07.172 ARDOPC listening on port 8515
+05:22:11.546 Host Control Session Connected
+05:22:11.546 Host Data Session Connected
+05:22:11.747 [Command Trace FROM host: INITIALIZE
+05:22:11.747  Command Trace TO Host BUFFER 0
+05:22:11.748  Command Trace TO Host INITIALIZE
+05:22:11.948 [Command Trace FROM host: MYCALL NOCALL
+05:22:11.950  Command Trace TO Host MYCALL now NOCALL
+05:22:12.150 [Command Trace FROM host: GRIDSQUARE FN31
+05:22:12.150  Command Trace TO Host GRIDSQUARE now FN31
+05:22:12.352 [Command Trace FROM host: FECID FALSE
+05:22:12.352  Command Trace TO Host FECID now FALSE
+05:22:12.553 [Command Trace FROM host: FECREPEATS 0
+05:22:12.553  Command Trace TO Host FECREPEATS now 0
+05:22:12.754 [Command Trace FROM host: SQUELCH 5
+05:22:12.755  Command Trace TO Host SQUELCH now 5
+05:22:12.956 [Command Trace FROM host: BUSYDET 5
+05:22:12.956  Command Trace TO Host BUSYDET now 5
+05:22:13.156 [Command Trace FROM host: LEADER 240
+05:22:13.157  Command Trace TO Host LEADER now 240
+05:22:13.357 [Command Trace FROM host: TRAILER 0
+05:22:13.358  Command Trace TO Host TRAILER now 0
+05:22:13.559 [Command Trace FROM host: ENABLEPINGACK TRUE
+05:22:13.559  Command Trace TO Host ENABLEPINGACK now TRUE
+05:22:13.760 [Command Trace FROM host: ARQTIMEOUT 120
+05:22:13.760  Command Trace TO Host ARQTIMEOUT now 120
+05:22:13.961 [Command Trace FROM host: LISTEN TRUE
+05:22:13.961  Command Trace TO Host LISTEN now TRUE
+05:22:14.163 [Command Trace FROM host: PROTOCOLMODE FEC
+05:22:14.164  Command Trace TO Host PROTOCOLMODE now FEC
+05:22:14.365 [Command Trace FROM host: AUTOBREAK TRUE
+05:22:14.366  Command Trace TO Host AUTOBREAK now TRUE
+05:22:14.566 [Command Trace FROM host: MONITOR TRUE
+05:22:14.567  Command Trace TO Host MONITOR now TRUE
+05:22:14.768 [Command Trace FROM host: CWID FALSE
+05:22:14.768  Command Trace TO Host CWID now FALSE
+05:22:14.969 [Command Trace FROM host: VERSION
+05:22:14.969  Command Trace TO Host VERSION ARDOP TNC_2.0.3.8-BPQ
+05:22:15.170 [Command Trace FROM host: STATE
+05:22:15.171  Command Trace TO Host STATE DISC
+05:22:15.194 Input peaks = -271, 279
+05:22:15.195  Command Trace TO Host INPUTPEAKS -271 279
+05:22:15.395 [Command Trace FROM host: FECMODE 4FSK.500.50
+05:22:15.395  Command Trace TO Host FECMODE now 4FSK.500.50
+05:22:15.596 [Command Trace FROM host: ARQBW 500
+05:22:15.597  Command Trace TO Host ARQBW now 500
+05:22:23.218 Input peaks = -272, 277
+05:22:23.218  Command Trace TO Host INPUTPEAKS -272 277

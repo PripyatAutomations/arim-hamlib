@@ -1,0 +1,1514 @@
+=====================================================================
+                       ARIM Release Notes
+=====================================================================
+
+Version 2.12
+------------
+* Fix bug causing incorrect calculation of elapsed time for inbound
+  file transfers listed in the ARQ File History view.
+
+Version 2.11
+------------
+* Implement access control by call sign, with two modes:
+  -- Whitelist: Only stations whose call signs appear in the list are
+     allowed to make ARQ connections or send FEC messages and queries
+     to the local station. ARIM immediately disconnects from inbound
+     ARQ connections from all other stations, and ignores any FEC
+     messages and queries sent by them.
+  -- Blacklist: Stations whose call signs appear in the list are not
+     allowed to make ARQ connections or send FEC messages and queries
+     to the local station. ARIM immediately disconnects from inbound
+     ARQ connections from the listed stations, and ignores any FEC
+     messages and queries sent by them.
+  A non-empty whitelist takes precedence over the blacklist, which is
+  ignored in that case. If the whitelist is empty or doesn't exist,
+  then the blacklist takes effect. If neither list exists then all
+  remote stations are granted access to the local station by default.
+* The following new configuration file parameters can be used
+  to define access control by call sign in the [arim] section:
+  -- 'ac-allow' is used to specify a whitelist. The value is a series
+     of one or more call signs, separated by commas (whitespace is
+     tolerated). You can use a wildcard (*) character at the end of a
+     call sign to include tactical call variations, e.g. NW8L* will
+     match NW8L, NW8L-1 NW8L-2 etc. Example:
+       ac-allow = W1AW, NW8L*, KA8RYU-1
+     The maximum length of an 'ac-allow' line is 255 characters.
+     Zero or more 'ac-allow" parameters are allowed in the [arim]
+     section of the configuration file. If multiple 'ac-allow'
+     parameters are present then their contents are combined to
+     create the whitelist. The total number of call signs is
+     limited to 512.
+  -- 'ac-deny' is used to specify a blacklist. The value is a series
+     of one or more call signs, separated by commas (whitespace is
+     tolerated). You can use a wildcard (*) character at the end of a
+     call sign to include tactical call variations, e.g. NW8L* will
+     match NW8L, NW8L-1 NW8L-2 etc. Example:
+       ac-deny = W1AW, NW8L*, KA8RYU-1
+     The maximum length of an 'ac-deny' line is 255 characters.
+     Zero or more 'ac-deny" parameters are allowed in the [arim]
+     section of the configuration file. If multiple 'ac-deny'
+     parameters are present then their contents are combined to
+     create the blacklist. The total number of call signs is
+     limited to 512. The blacklist is ignored if a whitelist is
+     specified by one or more non-empty 'ac-allow' parameters.
+* Update garim(5) man page and Help document.
+
+Version 2.10
+------------
+* Reset application state and UI after detecting unexpected shut
+  down of VARA modem.
+* Update Help document.
+
+Version 2.9
+-----------
+* Refine logic used to calculate the number of bytes sent during a
+  message or file upload in ARQ mode.
+* Adjust timing to speed up the response to a received /A3 command
+  during the mutual authentication process.
+* In ARQ mode, update timestamp in Heard List whenever data is
+  received from the remote station.
+* Immediately detach from the ARDOP TNC on detecting that it has
+  closed the TCP connection (e.g. on program exit).
+* Force the 'to' call sign to uppercase when saving a message to a
+  mailbox or sending a message to the remote station.
+* Update arim(5) man page and Help document.
+
+Version 2.8
+-----------
+* Allow specification of [tnc] specific log file directories in
+  the arim.ini file. This permits the logging output of different
+  TNCs to be directed into separate locations outside the default log
+  directory. Use this feature when running multiple instances of
+  ARIM concurrently so logging output from the TNCs isn't intermixed
+  in the default log files. The following new parameters can be used
+  in a [tnc] section:
+  -- 'log-dir' is used to specify the directory. The value may be
+     either a relative or absolute path. If a relative path is given
+     it is made relative the the user's home directory. Examples:
+       /var/log/nw8l/tnc1-logs (absolute)
+       tnc2-logs (relative, full path is /home/nw8l/tnc2-logs)
+     If the directory doesn't exist it will be created. Be careful
+     specifying absolute paths; the user invoking arim must have
+     permissions to create and write to files in that directory.
+  -- 'traffic-log' is set to TRUE to enable traffic logging in the
+     directory specified by the 'log-dir' parameter. Set to FALSE to
+     disable logging. Default: FALSE.
+  -- 'debug-log' is set to TRUE  enable debug logging in the directory
+     specified by the 'log-dir' parameter. Set to FALSE to disable
+     logging. Default: FALSE.
+  -- 'tncpi9k6-log' is set to TRUE to enable TNC-Pi9K6 debug logging
+     in the directory specified by the 'log-dir' parameter. Set to
+     FALSE to disable logging. Default: FALSE.
+  If one or more of 'traffic-log', 'debug-log' or 'tncpi9k6-log' are
+  set to TRUE, then logging output for this TNC is directed to the
+  directory specified by 'log-dir'. If 'traffic-log', 'debug-log'
+  and 'tncpi9k6-log' are all absent or all set to FALSE, then the
+  global settings in the [log] section are used, and logging output
+  is directed to the default log directory.
+  Thanks to Kevin, K3TL for suggesting this.
+* Update arim(5) man page and Help document.
+
+Version 2.7
+-----------
+* Add "ARQ File History" tab. This reports inbound and outbound
+  ARQ file transfers. For example:
+    [ 1] >> KA8RYU      Apr 14 23:45:24 [00:00:05] -z    177 bytes B074 test.txt
+  Included are: direction (>> inbound, << outbound), remote station
+  call sign, timestamp, elapsed time, compression flag, size in
+  bytes, checksum and file name. The list can hold up to 64 entries,
+  after which the oldest entry is dropped when a new one is added.
+* Add new command "clrfile" which clears the ARQ File History tab.
+* Filter out all control characters except newlines when printing
+  FEC data to the traffic log.
+* When sending a beacon, automatically cancel the operation if the
+  TNC doesn't transmit the data within 90 seconds.
+* Update embedded Help and PDF Help document.
+
+Version 2.6
+-----------
+* Add size field to message listing lines. This is the number of
+  bytes in decimal format (before compression).
+* Fix bug preventing insertion of empty lines in text of messages
+  composed with the 'cm' command.
+* Update Help document.
+
+Version 2.5
+-----------
+* Add optional message tracing feature. This inserts headers like:
+    Received: from KA8RYU by NW8L; Jan 30 2019 05:01:48 UTC
+  into received messages. If the message is forwarded to another
+  station with tracing enabled, another Received: header is added by
+  the receiving station, and so on. In this way a record of the
+  message's progress through a network is built up as it is forwarded
+  from station to station (read from bottom to top). The timestamp
+  indicates time of receipt, either local time or UTC time at the
+  receiving station, as set by the 'utc-time' parameter in the [ui]
+  section of the configuration file. No time zone is included for
+  stations configured for local time stamps (utc-time=FALSE). Message
+  tracing is enabled or disabled by the value of the 'msg-trace-en'
+  parameter in the [arim] section of the configuration file. Set to
+  TRUE to enable tracing or FALSE to disable it. The default value is
+  FALSE. The Received: header is inspired by, but not perfectly
+  conformant with, the Received: header specification in RFC822.
+* In ARQ mode, enforce size limit for file, file listing, and message
+  transfers *after* compression is applied. The max "over the air"
+  payload size remains 16K bytes, but input buffers are big enough to
+  accomodate compression ratios up to 5:1. If compressed input data
+  exceeds the 16K payload limit the transaction fails with an error.
+* In ARQ mode, where files may be compressed for download, don't
+  filter file listings to remove files larger than the max size
+  defined by the configuration file 'max_file_size' parameter.
+* In FEC mode, enforce size limit when sending files as messages.
+* Implement closed loop flow control for data transfers to TNC to
+  prevent overflow of TNC transmit data buffers.
+* Implement support for ARQBW choice "any" for ARDOP version 1 TNCs
+  when initiating ARQ connections from the command prompt.
+* Messages sent to net addresses are now stored in the Sent Messages
+  mailbox if successfully transmitted.
+* Update arim(5) man page and Help document.
+
+Version 2.4
+-----------
+* Add support for TNC-Pi9K6 hardware ARDOP TNC. This requires that
+  ARIM be installed on the Raspberry Pi unit hosting the TNC-Pi9K6
+  and interface with the TNC over the /dev/serial0 serial port.
+  These new parameters are used in a [tnc] section of the
+  configuration file to define the TNC-Pi9K6 port:
+  -- 'interface' may be 'serial' or 'tcp'. Set to 'serial' for a
+     port using the TNC-Pi9K6. Example:
+        interface = serial
+     The default is 'tcp'.
+  -- 'serial-port' is assigned the device name for the RPi serial
+     port used by ARIM to attach to the TNC-Pi9K6. Example:
+        serial-port = /dev/serial0
+     The default is '/dev/serial0', which is typical for the
+     TNC-Pi9K6 on an RPi host running the Raspbian OS.
+  -- 'serial-baudrate' is assigned the baud rate for the serial port
+     device. Example:
+        serial-baudrate = 115200
+     The default is '115200', which is typical for the TNC-Pi9K6
+     running ARDOP or ARDOP 2.
+  Another new parameter is used in the [log] section of the
+  configuration file:
+  -- 'tncpi9k6-log' is used to enable or disable the TNC-Pi9K6 debug
+     log on the RPi. Example:
+        tncpi9k6-log = TRUE
+     The log is written to a file in the ARIM 'log' directory with
+     a name like 'tncpi9k6-20181110.log' which includes a datestamp.
+     Although the log is rotated daily, it can become very large
+     with the default verbosity setting of 7. To reduce log size,
+     the 'LOGLEVEL' command can be sent to the TNC when the port is
+     initialized to change the level. Do this with a 'tnc-init-cmd'
+     parameter in the [tnc] section for the port. Example:
+        tnc-init-cmd = LOGLEVEL 6
+     ---------------------------------------------------------------
+     NOTE: Support for TNCPi9K6 debug logging must be compiled in to
+     the ARDOP or ARDOP 2 Teensy program. To do this, change line 79
+     in "TeensyProjects/libraries/TeensyConfig/TeensyConfigARDOP.h"
+     from this:
+        #define MONPORT Serial
+     to:
+        //#define MONPORT Serial
+     in other words, comment out line 79.
+     ---------------------------------------------------------------
+  As an example, [tnc] #2 in the sample 'arim.ini' file supplied
+  with the ARIM distribution is configured as a TNC-Pi9K6 port.
+  ------------------------------------------------------------------
+  NOTE: In testing, I've noticed a problem with FEC data transfers
+  in the ARDOP and ARDOP 2 software for the TNC-Pi9K6. The symptom
+  is intermittent failure of FEC transmissions such as messages or
+  beacons, with a re-start of the TNC required to recover. Perhaps
+  this is a peculiarity of my RPi-3/TNC-Pi9K6 system, so I'm very
+  interested in hearing reports from others. If you experience the
+  same problem, there's an effective work-around. It consists of
+  making a simple source code change in the ARDOP_Teensy or
+  ARDOP2_Teensy project and re-compiling. For example, if using
+  ARDOP 2, change line 53 in file "TeensyProjects/ARDOP2/FEC.c"
+  from:
+     FECRepeats = intRepeats;
+  to:
+     FECRepeats = intRepeats = 0;
+  The process is the same for the ARDOP_Teensy project. This,
+  unfortunately, prevents the use of FECREPEATS > 0 in ARIM. Be
+  sure to use the latest TeensyProjects source code available here:
+  <http://www.cantab.net/users/john.wiseman/Downloads/Beta/>
+  Download the "TeensyProjects.zip" file.
+  ------------------------------------------------------------------
+* Add support for ARDOP version 1 as well as version 2. ARIM detects
+  the TNC version when attaching and adapts to the FECMODE and
+  ARQBANDWIDTH options available for that version.
+* Fix bug where upload progress meter not showing when sending the
+  response to an ARIM query in FEC mode.
+* Update arim(5) man page and Help document.
+
+Version 2.3
+-----------
+* Do not send PING command to TNC if it's not in DISC state.
+* In FEC mode, don't start download progress meter when ARIM
+  message frames addressed to a different station are heard.
+* If the command prompt is active, but empty, pressing the backspace
+  key will deactivate it.
+
+Version 2.2
+-----------
+* Introduce progress meter feature for file, message, query response,
+  and directory listing data transfers. The meter is located on the
+  status bar and appears when an upload or download begins to
+  indicate percentage of completion as the tranfer progresses.
+  Suggested by Doug, WB6VAC, thanks!
+* Fix bug where remote file listing view didn't close and return to
+  the traffic monitor view when the 'cd' command was invoked.
+* Extend dwell time of status bar messages to 5 seconds.
+* Correct errors in arim.5 man page.
+* Update the PDF Help doc.
+
+Version 2.1
+-----------
+* Adapt to changes in ARDOP 2 introduced in ARDOP_2Win version 2.0.4
+  including the ARQ bandwidth negotiation feature.
+* Add new command 'arqnegbw'. Use this to change the NEGOTIATEBW
+  setting on the TNC from the ARIM command prompt. For example:
+     arqnegbw TRUE
+* Add new parameter 'arq-negotiate-bw' to the [tnc] section of the
+  arim.ini configuration file:
+     arq-negotiate-bw = TRUE
+  The value must be TRUE or FALSE. Default: TRUE. ARIM detects the
+  TNC version and doesn't try to set this parameter on the ardop2 or
+  piardop2 TNCs from G8BPQ.
+* Add ARQ bandwidth field to the Connection History view.
+* Adjust to new gcc 8 string format truncation diagnostics. Change
+  'snprintf' destination buffer sizes where needed and explicitly
+  handle certain format truncation cases to satisfy the compiler and
+  prevent warnings.
+* Copy 'test.txt' file from /usr/local/share/arim only when missing
+  from user's local shared files directory.
+* Set LISTEN to FALSE when sending ARQ connection requests.
+* Fix bug where ARQBW value in ARQ "Connecting... ARQBW=XXX" trace
+  was missing when no ARQBW was specified by 'conn' command.
+* Fix bug causing occasional failure to prompt user to save message
+  to outbox when the message send operation is canceled with ESC.
+* Update arim(5) man page, embedded Help and PDF Help doc.
+
+Version 2.0
+-----------
+* Adapt ARIM to ARDOP TNC version 2.
+  The ARQ bandwidth selection is simplified, with 3 options:
+     200, 500 and 2500 Hz.
+  The FECMODE selection is changed. The options are:
+    4PSK.200.50, 4PSK.200.100, 16QAM.200.100, 4FSK.500.50,
+    4PSK.500.50, 16QAMR.500.100, 16QAM.500.100, 4FSK.1000.50,
+    4PSKR.2500.50, 4PSK.2500.50, 16QAMR.2500.100, 16QAM.2500.100
+  The FEC Control menu is updated to reflect these changes.
+  Note: This version of ARIM is NOT compatible with ARDOP TNC
+  versions 1.0.x.x, nor with ARIM versions 1.9 and earlier.
+* Extend syntax of the 'conn' command to allow specification of the
+  ARQBW for the connection attempt. An ARDOP 2 connection request
+  fails immediately if the ARQBW of the connecting ("client")
+  station's TNC and the remote station's TNC are not identical. The
+  'conn' command now offers the operator control of the arq bandwidth
+  setting for individual connection requests, and a way to connect
+  efficiently if the ARQBW of the remote station is unknown:
+     conn call rpts [bw]
+  'call' is the remote station call sign. 'rpts' is the max number
+  of repeats, and 'bw' is an optional ARQ connection bandwidth
+  specifier. The allowed values for 'bw' are:
+     200, 500, 2500 or 'any' (not case sensitive).
+  - If no 'bw' parameter is given then ARIM will use the current
+    ARQBW setting (set in the arim.ini file or by using the 'arqbw'
+    command in ARIM).
+  - If '200', '500' or '2500' are given then ARIM will attempt to
+    connect using only the specified bandwidth. This is useful if
+    the ARQBW of the remote station is known, but different from that
+    of the connecting station's TNC.
+  - If 'any' is specified, ARIM will attempt to connect using each of
+    the possible ARQBW settings in succession, starting with the
+    current ARQBW. If the the result is a REJECTEDBW response from
+    the remote station, then the attempt is repeated with another
+    ARQBW after a 5 second settling time has passed. NOTE: ARIM
+    stops trying if the remote station is unreachable (has not
+    responded with either a CONACK or a REJECTEDBW frame after 'rpts'
+    requests have been sent).
+  Examples:
+     conn nw8l 5      (uses the currently set ARQBW)
+     conn nw8l 5 200  (uses an ARQBW setting of 200)
+     conn nw8l 5 any  (tries all ARQBW settings in turn)
+  The effect of forcing an ARQBW setting with the 'conn' command is
+  temporary; when the ARQ session ends the client station's ARQBW
+  setting reverts to it's original value.
+* Add new "CONNECTION HISTORY" view, which displays a list of ARQ
+  connections made, both inbound and outbound. Press 'c' to open the
+  view. Connection info shown is:
+     Direction of connection request, in or out.
+     Call sign of remote station.
+     Grid square of calling station (local or remote).
+     Connection start time, format: DD Mon HH:MM:SS.
+     Connection duration time, format: HH:MM:SS.
+     Number of bytes received.
+     Number of bytes transmitted.
+  Press 'u' and 'd' to scroll. Press 'c' again to close the view.
+  To clear the view, type 'clrconn' at the command prompt.
+* Fix bug preventing clean compile of ARIM from source code on older
+  Linux operating systems with ncurses library versions < 5.10. On
+  these systems the ITALIC text attribute won't work in UI theme
+  definitions in the arim-themes file; it will default to NORMAL.
+* Update embedded Help, PDF Help doc and man files as needed.
+
+Version 1.9
+-----------
+* Add "remote file listing" feature in ARQ mode. Use new commmand
+  '/flget' to download a file listing for a shared files folder on
+  the remote station. This listing is displayed in the new "List
+  Remote Files" view, which opens automatically after the listing
+  is downloaded. Like the existing local file viewer, directories
+  and files are assigned an index number, making it easy to work
+  with them without typing in lengthy commands at the prompt. The
+  following commands are available in the viewer:
+    'cd [-z] nbr' is used to change directories. The optional '-z'
+       switch enables compression to reduce the transfer time of the
+       new listing. 'nbr' is the index number of the directory. A
+       file listing for the specified directory is downloaded and
+       shown in a fresh instance of the viewer.
+    'rf nbr' closes the view and prints the specified remote file in
+       the Traffic Monitor.
+    'gf [-z] nbr [dir]' closes the view and downloads the specified
+       file nbr. The '-z' option enables compression to reduce the
+       transfer time of the download. The 'dir' option allows the
+       operator to specify a particular local directory to store the
+       file in.
+    'q' quits the viewer.
+  The viewer closes automatically when one of these commands is
+  invoked. Press the '#' hot key to reopen it if you need to continue
+  working with the remote file listing it contains. Note: the viewer
+  can be reopened only in ARQ mode.
+* Add new ARQ mode command:
+     '/flget [-z] [dir]'
+  This command is used to download a file listing from the remote
+  station and display it in the Remote File Listing view. The '-z'
+  option enables compression to reduce the transfer time of the
+  file listing download. 'dir' is the directory of interest at the
+  remote station. If not specified, the default shared files folder
+  at the remote station is listed. Examples:
+     /flget
+     /flget -z skeds/rr-net
+  Mutual authentication will be triggered automatically if '/flget'
+  is used to list an access-controlled directory when the session is
+  not yet authenticated.
+* Add UI themes feature. Themes control the color coding and text
+  attributes of the various elements of the user interface. Two
+  built-in themes, DARK and LIGHT, are always available, and up to 5
+  custom themes can be defined by the user in the 'arim-themes' file.
+  When ARIM starts, the theme set by the 'theme' parameter of the
+  [ui] section of the configuration file is loaded. You can change
+  the UI theme at any time by using the 'theme' command at the
+  command prompt. Note: themes work only when the 'color-code'
+  parameter in the [ui] section of the arim.ini configuration file is
+  TRUE. See the PDF Help file and the 'arim(5)' man page for details.
+* Add new command 'theme'. Use this to change the UI theme. For
+  example:
+     theme name
+  Where 'name' is the name of a UI theme, either one of the built-in
+  themes DARK or LIGHT, or a custom theme define in the arim-themes
+  file. This erases the terminal and re-draws it using the specified
+  theme.
+* Add new parameter 'theme' to the [ui] section of the arim.ini
+  configuration file:
+     theme = name
+  where 'name' is the name of a UI theme, either one of the built-in
+  themes DARK or LIGHT, or a custom theme defined in the arim-themes
+  file. The specified theme will be loaded when ARIM starts. The
+  default theme is DARK.
+* Add PDF versions of the ARIM man pages to the distributions.
+* Update embedded Help and PDF Help file.
+
+Version 1.8
+-----------
+* Discontinue use of PTT asynch responses from the ARDOP TNC as an
+  indication of link activity in an idle ARQ connection. This
+  prevents premature time outs when TNC is configured for serial port
+  PTT or CAT radio control.
+* Don't show placeholder call sign "?????" in calls heard list.
+* Correct typos in PDF Help file.
+
+Version 1.7
+-----------
+* Fix latent bug which can cause a segfault when processing
+  ill-formed commands in certain circumstances.
+* Add missing header file #include to fix broken build on Red Hat
+  derived Linux systems.
+* Update INSTALL and Help docs with link to instructions for building
+  an RPM package from the ARIM source distribution on Red Hat derived
+  Linux systems, and using it to install ARIM. Instructions and .spec
+  file are maintained by David Ranch, KI6ZHD, thanks!
+* Update PDF Help file and arim.5 man file to correct spelling of
+  configuration file parameter 'name'.
+
+Version 1.6
+-----------
+* When a connection request is rejected by either the local or remote
+  ARDOP TNC because it's busy or the bandwidth negotiation failed,
+  print informative message to the traffic monitor view and log.
+* When the operator cancels an operation by pressing the ESC key,
+  print an informative message to the traffic monitor view and log.
+  Suggested by Doug, WB6VAC, thanks!
+* Fix bug where status indicators on status bar were not refreshed
+  after a connection request is rejected because the remote TNC is
+  busy or the bandwidth negotiation fails. This made ARIM appear to
+  be stuck in ARQ mode when it really wasn't.
+
+Version 1.5
+-----------
+* Fix bug where ARIM's busy state not reset when detaching from TNC,
+  which prevented attempts to initiate a new operation if ARIM's
+  busy state was TRUE at the time.
+* Force reset of ARIM's busy state when the ESC key is pressed.
+  ARIM depends on notifications from the TNC which indicate the state
+  of the TNC's busy detector. In some cases, ARIM may not receive a
+  BUSY FALSE notification when one is expected. This can leave ARIM
+  stuck in the [RF CHANNEL BUSY] state, and attempts to start a new
+  operation will fail. If this happens, the operator can recover by
+  pressing the <ESC> key to reset ARIM's busy state.
+* Remove delay in changing ARIM busy state after receiving BUSY FALSE
+  notification from TNC.
+* Update embedded Help and PDF Help file.
+
+Version 1.4
+-----------
+* Improve ARQ connection request logic to prevent ARIM from timing
+  out when the ARDOP TNCs are having difficulty establishing the
+  connection.
+* Fix bug sometimes causing 'TNC busy' errors after an ARQ session
+  has timed out if connection was initiated immmediately after
+  receiving an ARDOP frame (e.g. ping ack frame if pilot pings are
+  used).
+
+Version 1.3
+-----------
+* Add message listing feature in ARQ mode. Once connected to
+  another station, use the '/mlist' command to retrieve a list of
+  messages addressed to your station. Your station must be
+  authenticated; if not the remote station will respond with an
+  authentication challenge first. The syntax is:
+     /mlist
+  All messages in the remote station's outbox which are addressed to
+  your TNC's call sign (mycall) will be listed, in chronological
+  order (oldest first).
+* Add message download feature in ARQ mode. Once connected, use the
+  '/mget' command to retrieve messages addressed to your station from
+  the remote station's outbox. Your station must be authenticated;
+  if not the remote station will respond with an authentication
+  challenge first. The syntax is:
+     /mget [-z] [n]
+  where the optional '-z' switch invokes on-the-fly compression of
+  the messages, and the optional 'n' parameter is the maximum number
+  of messages to download. Up to n messages addressed your TNC's call
+  sign (mycall) will be downloaded to your inbox, starting with the
+  oldest message first. If n is not given, the default limit is 10
+  messages. This is useful for stations that are on the air only
+  intermittently.
+* In FEC mode, check to see if the channel is busy before sending
+  messages, queries, files, beacons, unproto text and pings. If busy,
+  cancel the operation. If sending a message, prompt the operator to
+  save to the outbox (y/n). This will help avoid collisions during
+  net operations or wasted transmissions when interfering signals
+  appear in the channel. Requires version 1.0.2.5j-BPQ or higher of
+  the ardopc/piardopc TNC. Works with version 1.0.2.5 of the
+  ARDOP_Win TNC.
+* Add "RF CHANNEL BUSY" indicator below the status indicators. This
+  is driven by BUSY notifications from the TNC, which appear during
+  FEC operations but not during an ARQ session.
+* Command history buffer added to command prompt in the message
+  listing and file listing views. Use the CTRL-P (previous) and
+  CTRL-N (next) keys to browse the recent command history when you
+  want to reuse a previously sent command. The buffer holds the 10
+  most recently sent commands.
+* Improve configuration file "dump" feature. When ARIM is run with
+  the '-p' or '--print-conf FILE option, for example:
+     arim -p dump.txt
+  the file will contain a listing of configuration parameters with
+  the values *after* processing. This is useful for troubleshooting.
+  Invalid parameter values will be replaced with default values, and
+  parameters with misspelled names will be absent.
+* Add 'arqbw' and 'busydet' parameters to the TNC Settings dialog.
+  Remove 'pname' parameter, this is always shown in the ARIM title
+  bar when ATTACHED to the TNC.
+* Update embedded Help and PDF Help file.
+
+Version 1.2
+-----------
+* Introduce optional Mutual Authentication feature used to verify
+  the identities of the stations in an ARQ session. This works by
+  making each station prove to the other that it possesses a shared
+  secret (password) known only to the two stations involved. This is
+  done using a Digest Access Authentication scheme very similar to
+  that specified in RFC 2069 [1] with the exception that the MD5 hash
+  function is replaced by the more modern and secure Blake2 [2] hash
+  function. The exchange of proofs is accomplished without sending
+  the password itself over the air. The process is automatic and
+  requires no operator intervention. This feature can be used to:
+    * verify the identity of the station you connect to in ARQ mode.
+    * grant another station access to controlled resources located on
+      your station.
+  --------------------------
+  ARQ session authentication
+  --------------------------
+  Once an ARQ connection is established, the operator can invoke the
+  mutual authentication process manually using the '/auth' command.
+  If it succeeds, the identity of the remote station is proven and
+  the operator can read, upload or download files with confidence. If
+  it fails, because one station or the other doesn't know the shared
+  secret (password), the operator is presented with a warning
+  message and given the choice of either continuing or terminating
+  the ARQ session.
+  ------------------
+  ARQ access-control
+  ------------------
+  Shared files directories at a station can be designated as
+  "access-controlled" with the 'ac-files-dir' parameter in the ARIM
+  configuration file. These resources are available only to stations
+  that successfully authenticate themselves in an ARQ session. By
+  default, the authentication process is triggered automatically on
+  the first attempt by a station to access a controlled resource.
+  However, the operator can issue the '/auth' command pre-emptively
+  to authenticate with the remote station before attempting to access
+  controlled directories and their contents. If mutual authentication
+  is successful, the command is re-sent and subsequent accesses of
+  controlled resources on the remote station proceed normally.
+
+  Note that shared files directories defined by 'add-files-dir'
+  parameters in the ARIM configuration file are not
+  access-controlled. These are accessible to any station in ARQ and
+  FEC mode operations. Likewise, the root shared files directory is
+  always accessible to any station for file listing, uploads and
+  downloads.
+  ----------------------------------------------
+  The authentication challenge/response protocol
+  ----------------------------------------------
+  a. The process begins when the operator at one station (the
+  "client"), connects to another station (the "server") and:
+     * attempts to access a controlled resource for the first time
+  or
+     * sends the '/auth' command
+
+  b. At the server station, ARIM receives the command and recognizes
+  that authentication is required. It searches its password digest
+  file for an entry with the client station's call sign as the
+  "client" and its own call sign as the "server". If it cannot find
+  such an entry, it responds with '/EAUTH' and the operator at the
+  client station is informed that authentication has failed. If ARIM
+  does find such an entry, it responds with an authentiation
+  "challenge" in the form of the '/A1' command. The challenge
+  includes an opaque "nonce", a token whose content it controls and
+  which must be incorporated into the response made by the client
+  station.
+
+  c. At the client station, ARIM receives the '/A1' command. It
+  searches its password digest file for an entry with its own call
+  sign as the "client" and the server station's call sign as the
+  "server". If it cannot find such an entry, it responds with
+  '/EAUTH' and the operator at the client station is informed that
+  authentication has failed. If the needed entry is found, ARIM
+  computes a response token which proves that it knows the shared
+  secret. The response is H(HA1:nonce:HA2) where:
+     H(x) is: the Blake2 hash of an array of data 'x'.
+     HA1 is: H(client_call:server_call:password), the password hash
+        token stored in the password digest file at the client
+        station.
+     nonce is: the token sent by the challenger to influence the
+        response hash value.
+     HA2 is: H(method:path) where 'method' is 'FPUT', 'FGET', 'FLIST'
+        or 'FILE' and 'path' is the directory or file path referenced
+        by the command.
+  Thus the response to each challenge is unique, in a way dependent
+  on the nature of the request and the 'nonce' issued by the
+  challenger. This makes "replay" attacks difficult to mount and
+  recovery of the password from the response computationally
+  infeasible. ARIM sends the response token plus a challenge nonce to
+  the server station in the form of the '/A2' command.
+
+  d. At the server station, ARIM receives the '/A2' command and
+  checks the challenge response token it contains. It does this by
+  computing the response token it expects using the password digest
+  token (HA1) stored in the password digest file it owns. It compares
+  this with the response token received from the client station. If
+  they don't match, then the client station must not have the same
+  password digest that ARIM has stored locally. In this case ARIM
+  will send '/EAUTH' to the client station where the operator will be
+  informed that authentication has failed. If they match, then the
+  client station has proven it's authenticity and ARIM will send a
+  response the the challenge contained in the '/A2' command. As
+  before, this is computed as H(HA1:nonce:HA2), using the challenge
+  nonce received from the client station. ARIM sends this response to
+  the client station in the form of the '/A3' command.
+
+  e. At the client station, ARIM receives the '/A3' command and
+  checks the challenge response token it contains. It does this by
+  computing the response token it expects using the password digest
+  token (HA1) stored in the password digest file it owns. It compares
+  this with with the response token received from the server station.
+  If they don't match, the server station must not have the same
+  password digest that ARIM has stored locally. In this case ARIM
+  will inform the operator that authentication has failed. If they
+  match, then the server station has proven its authenticity and ARIM
+  re-sends the command that triggered the process, unless it was the
+  '/auth' command. In that case there is no work to do so ARIM simply
+  sends the '/OK' response to signal that the mutual authentication
+  is complete.
+  To strike a reasonable balance between security and the "air time"
+  cost of the challenge/response data exchanges, challenge nonces
+  contain 6 bytes of data and the Blake2 response hash is truncated
+  to 21 bytes, or 168 bits (big enough for excellent collision
+  resistance). These are sent in base64 encoded form making the
+  over-the-air sizes 8 and 28 bytes respectively.
+  -------------------
+  Password management
+  -------------------
+  Passwords are created at the ARIM command prompt with the 'passwd'
+  command and stored in digest ("hashed") form in a file. Passwords
+  are hashed with a "salt" (the call signs of the corresponding
+  stations), so that any given password results in unique hash for
+  different call sign pairs. This hash is identical to the 'HA1' term
+  used in the digest authentication scheme, so it can be read out of
+  the password digest file when needed, making it unnecessary to
+  store the original password. Mathematically, the Blake2 hash
+  function is a strong "one way" function; it is computationally
+  infeasible to recover the password from the hash. Because the
+  password hash is stored in a file the authentication process can
+  operate without operator intervention; there's no need to remember
+  and enter the password each time.
+  ---------------------------
+  Note on client/server roles
+  ---------------------------
+  In the context of an ARQ session, the term "client" refers to the
+  station where an operator triggers the authentication process by:
+     a. sending the '/auth' command to the other station
+     b. attempting to access a controlled resource at the other
+        when the ARQ session is not yet authenticated.
+  When this happens the other station assumes the role of "server"
+  and responds with an authentication challenge. These definitions
+  imply that an operator is always present at the client station, but
+  not at the server station, which is assumed to be operating
+  automatically. However, once an ARQ connection is established
+  between two stations, the operator at either end can seize the
+  client role by being the first to trigger the mutual authentication
+  process.
+  For authentication to succeed, the 'passwd' command must be invoked
+  at both stations like this:
+     passwd client_call server_call some-password
+  Let's assume that 'client-call' is KA8RYU, and 'server-call' is
+  NW8L-1. So at each station 'passwd' is invoked like this:
+     passwd KA8RYU NW8L-1 some-password
+  Now KA8RYU can connect to NW8L-1 and successfully authenticate if
+  challenged. However, this doesn't mean that the reverse is true:
+  NW8L-1 can't connect to KA8RYU and do the same. For this to happen
+  the 'passwd' command must be invoked at each station with NW8L-1 as
+  the client:
+     passwd NW8L-1 KA8RYU another-password
+  Now either station can connect to the other and play the role of
+  "client" to the other station's role of "server" in the
+  authentication process.  If we read the password digest file at
+  either station using the 'rp' command in the Shared Files viewer we
+  see something like this:
+     KA8RYU:NW8L-1:SEQo2oa1kOHXcBqRyDrn6wz7f8RDNAzNQAQxS31q
+     NW8L-1:KA8RYU:CnCI11S3AxSzCAtgckzqM4pKrkr+wxWaIGT0E6EU
+  There are two entries, one for KA8RYU as client to NW8L-1 as
+  server, and another for NW8L-1 as client to KA8RYU as server. This
+  allows both one-way and two-way relationships to be defined. For
+  instance, a station serving as a document repository can issue
+  passwords to multiple stations who connect to it as clients and
+  access the controlled files it offers. However, no such password is
+  issued to the repository station by the client stations; it cannot
+  connect to any of them in the client role and authenticate for the
+  purpose of accessing any controlled resources they publish.
+  ----------
+  References
+  ----------
+  [1] https://www.ietf.org/rfc/rfc2069.txt
+  [2] https://www.ietf.org/rfc/rfc7693.txt
+* Add optional 'access control' feature. This allows you to
+  designate shared files directories which are accessible only to
+  authenticated stations in an ARQ session. If an ARQ session is not
+  yet authenticated, the first attempt by an operator to access a
+  controlled directory or file with the '/FPUT', '/FGET', '/FLIST' or
+  '/FILE' commands triggers an authentication challenge from the
+  remote station. If both stations possess the shared secret
+  (password), then the authentication process succeeds and the
+  command is executed. If it fails, the operator is presented with a
+  warning message and given the choice of either continuing or
+  terminating the ARQ session. The authentication process requires no
+  operator intervention because the password is stored in digest
+  ("hashed") form in a file at each station. From that point on,
+  subsequent accesses of controlled directories proceed normally.
+  Use new configuration file parameter 'ac-files-dir' in the [arim]
+  section to specify an access-controlled shared files directory. For
+  example:
+     ac-files-dir = admin
+  or
+     ac-files-dir = admin/*
+  This parameter uses the same syntax as the 'add-files-dir'
+  parameter; see the ARIM Help document for details. The directory
+  path must be relative to the shared files root directory specified
+  by the 'files-dir' parameter. Up to 16 'ac-files-dir' parameters
+  may be defined.
+  -----
+  Note that shared files directories defined by 'add-files-dir'
+  parameters in the ARIM configuration file remain public, and that
+  the root shared files directory is always accessible to any station
+  for file listing, uploads and downloads.
+* Add new command 'passwd'. Use this to create or change a password
+  to allow another station to authenticate itself to your station,
+  or, vice versa, for use by your station to authenticate itself to
+  another station. For example:
+     passwd client_call server_call jabber#wocky
+  The first parameter is the call sign of the "client" station. This
+  is the station whose operator will connect to another station, the
+  "server" station and needs the password to authenticate if
+  challenged.  The second parameter is the call sign of the TNC at
+  the "server" station to which the client station connects. This is
+  the call sign set by the 'mycall' parameter in the corresponding
+  [tnc] section in the arim.ini configuration file at the server
+  station. The third parameter is the password, which may include any
+  printable character, and has a maximum length of 32 characters.
+  -----
+  See the "Note on client/server roles" section above for a
+  discussion of the client/server roles and password setup for
+  different cases.
+  -----
+  The password digest file is named "arim-digest" and is located in
+  the same directory as the arim.ini configuration file. To protect
+  against accidental disclosure of password file contents, any file
+  named 'arim-digest', or variations like 'arim-digest.bak', no
+  matter where located in the file system, are protected against
+  access by a remote station. Avoid easy-to-guess passwords, and
+  never include the call signs of the client or server stations in
+  the password.  While the base64 encoded Blake2 digest (HA1) may
+  look quite random, it contains only as much entropy as the original
+  password, so choose passwords well.
+* Add new command 'delpass'. Use this to delete a password entry
+  from the password file. For example:
+     delpass KA8RYU NW8L-1
+  Like the passwd command, the first parameter is the call sign of
+  the client station and the second is the call sign of the TNC at
+  the server station.
+* Add new command 'rp' to the "List Files" view . Use this to read
+  the "arim-digest" password digest file. Each line has three parts,
+  in this order: the client call sign, the server call sign, and the
+  Blake2 hash of the combination of both call signs and the password.
+  For example:
+     KA8RYU:NW8L-1:IhUyNUJ+J37BV9/dqyjM4sw3bUyDv8v6rFyy0tPx
+  The file is named "arim-digest" and is located in the same
+  directory as the arim.ini configuration file. This is useful for
+  keeping track of passwords you have stored.
+* Add new ARQ command '/auth'. This can be used to immediately
+  authenticate the remote station after you connect.
+* In file listings made with the 'flist' command, access-controlled
+  directories are marked with a '!' (bang) character, like this:
+     [16:16:34] >> [@]              medical    !DIR
+  to indicate that they are accessible only to authenticated stations
+  in an ARQ session. Access controlled directories are also marked
+  with a '!' in the Shared Files viewer:
+     [ 11] admin                      !DIRECTORY Jan 14 02:58 2018
+* Add new indicator '+' to the ARQ status field. If an ARQ session
+  is authenticated, then the '+' character is appended to the call
+  sign of the remote station.
+* Notes on interoperability with older versions of ARIM:
+  a. The ARQ mode file upload protocol (/fput command) in version
+  1.2 is changed slightly and is NOT compatible with previous
+  versions. Otherwise, version 1.2 is interoperable with older
+  versions of ARIM in ARQ mode.
+  b. FEC mode operations are unchanged; version 1.2 is fully
+  interoperable with older versions. Note that the contents of access
+  controlled directories are never accessible to FEC mode commands
+  like 'flist' and 'file'. However, the contents of the root shared
+  files directory and additional shared directories declared with the
+  'add-files-dir' parameter in the configuration file are always
+  accessible.
+* Update man pages, embedded Help and PDF Help file.
+
+Version 1.1
+-----------
+* Fix bug in ARQ mode where incoming commands were not
+  parsed properly if split across multiple ARDOP ARQ frames.
+* Ignore unexpected PINGACK frames received from TNC.
+* In ARQ IRS state, if link is lost, print a "timeout" notice
+  to the Traffic Monitor when ARIM times out and returns to
+  the idle state. Extend IRS timeout period to 90 seconds.
+* During an ARQ inbound or outbound connection attempt, if
+  link is lost, print a "timeout" notice to the Traffic
+  Monitor when ARIM times out and returns to the idle state.
+* In pilot ping mode, increase delay between receipt of PINGACK
+  frame and start of next transmission to guarantee that the
+  TNC is ready to proceed.
+* Add facility to send arbitrary TNC initialization commands
+  upon ATTACHING to a TNC. These commands are specified in the
+  arim.ini configuration file, in the [tnc] section, using new
+  parameter 'tnc-ini-cmd'. Up to 32 of these commands may be
+  defined for each TNC, each with a maximum length of 128
+  characters. For exammple:
+     tnc-init-cmd = SLOWCPU TRUE
+     tnc-init-cmd = DRIVELEVEL 90
+  This is useful for passing commands which are not understood
+  by ARIM, such as future radio control commands, and for TNC
+  test and development purposes. Commands are send verbatim
+  without validation of the command name or its parameters.
+* Update PDF Help file.
+
+Version 1.0
+-----------
+* Adapt to new ARDOP TNC Host Interface Specification effective
+  with ARDOP_Win and ardopc version 1.0.2. These are breaking
+  changes, ARIM version 1.0 is NOT backward compatible with
+  earlier versions of the ARDOP TNC. TNC version 1.0.2 is NOT
+  interoperable with previous TNC versions.
+* Adjust menu of FEC modes to conform to changes made in ARDOP
+  TNC v1.0.2. These modes were dropped:
+     8FSK.200.25, 4FSK.200.50, 16FSK.500.25S, 16FSK.500.25,
+     4FSK.1000.100, 4PSK.1000.167, 8PSK.1000.167, 4FSK.2000.100,
+     4PSK.2000.167 and 8PSK.2000.167.
+  These modes were added:
+     16QAM.1000.100 and 16QAM.2000.100.
+  NOTE: if upgrading from ARDOP TNC version 0.9.5, check your
+  arim.ini file! Make sure that 'fecmode' parameters in the
+  [tnc] sections don't reference one of the deleted modes
+  listed above.
+* Improve contrast of PING and ID ARDOP frame traces printed
+  to the Traffic Monitor and Calls Heard views.
+* Update embedded Help and PDF Help file.
+
+Version 0.36
+------------
+* Add "new message" and "new file" counters to the title bar.
+  These are incremented when receiving a message or file. Press
+  the 'n' key to clear these counters. If either counter is non-
+  zero then you'll be prompted to confirm the operation; press
+  'y' to proceed or 'n' to cancel.
+* Fix bug causing 'srpts' limit to be 3, not 5 as documented.
+* Fix bug where changes to the 'fecrepeats' TNC setting were not
+  reflected in the status bar's FEC mode and repeat count field.
+* Update embedded Help and PDF Help file.
+
+Version 0.35
+------------
+* Add on-the-fly compression option for binary message and file
+  transfers executed in ARQ mode. Use the '-z' switch to invoke
+  this feature as follows:
+  - At the command prompt during an ARQ session, add the -z
+    switch to the '/fget' or '/fput' commands:
+       /fget -z test.txt
+       /fput -z test.txt
+  - In the message outbox viewer during an ARQ session, add the
+    -z switch to the 'sm' command:
+       sm -z 5
+  - In the message inbox and sent messages viewer during an ARQ
+    session, add the -z switch to the 'fm' command:
+       fm -z 7
+  - In the shared files viewer during an ARQ session, add the
+    -z switch to the 'sf' command:
+       sf -z 5
+  The message or file is sent in RFC 1950 "zlib" format, using
+  the "deflate" compression method documented in RFC 1951. It
+  is automatically decompressed at the receiving station to
+  recover the original file or message. Note:
+  - Compression is not an option for queries, messages or file
+    transfers in FEC mode, or when using the query commands in
+    ARQ mode (e.g. '/file'). These are text-only protocols.
+  - Compression isn't useful for very small messages or files, or
+    files that are already compressed (e.g. "zip" files or many
+    image file types). In these cases the zlib format overhead
+    can make the file size increase, not decrease.
+  The compression feature depends on the zlib runtime library,
+  which is installed by default on Linux and Cygwin. However, to
+  compile ARIM from sources the zlib development package must
+  also be installed. This is 'zlib1g-dev' on Linux and 'zlib-devel'
+  on Cygwin. Read INSTALL in the source code tarball for details.
+  Suggested by Doug, WB6VAC, thanks!
+* Extend the 'sf' commmand in the shared files viewer to include
+  an optional destination directory specification for the
+  remote station:
+     sf 3 test-files
+  This uploads file number 3 into the 'test-files' subdirectory
+  of the shared files root directory at the remote station. The
+  destination directory must be made accessible by an
+  'add-files-dir' parameter in the [arim] section of the arim.ini
+  configuration file at the remote station. Another example:
+     sf 3 uploads/net-reports
+  Here file number 3 is uploaded into the 'uploads/net-reports'
+  subdirectory of the shared files root directory at the remote
+  station. Suggested by Doug, WB6VAC, thanks!
+* Extend the '/fput' ARQ commmand to include an optional
+  destination directory specification for the remote station:
+     /fput test.txt > test-files
+  This uploads file 'test.txt' to the 'test-files' subdirectory
+  of the shared files root directory at the remote station.
+  The destination directory must be made accessible by
+  an 'add-files-dir' parameter in the [arim] section of the
+  arim.ini configuration file at the remote station. Note the use
+  of the '>' operator before the destination directory.
+  Another example:
+     /fput nets/march2017.txt > uploads/net-reports
+  Here file 'march2017.txt', located in the 'nets' subdirectory
+  of the local station's shared files root directory, is uploaded
+  into the 'uploads/net-reports' subdirectory of the shared
+  files root directory at the remote station.
+* Extend the '/fget' ARQ commmand to include an optional
+  destination directory specification for the local station:
+     /fget test.txt > test-files
+  This downloads file 'test.txt' to the 'test-files' subdirectory
+  of the shared files root directory at the local station. The
+  destination directory must be made accessible by an
+  'add-files-dir' parameter in the [arim] section of the arim.ini
+  configuration file at the local station. Note the use of the '>'
+  operator before the destination directory. Another example:
+     /fget nets/march2017.txt > uploads/net-reports
+  Here file 'march2017.txt', located in the 'nets' subdirectory
+  of the remote station's shared files root directory, is
+  downloaded into the 'uploads/net-reports' subdirectory of the
+  shared files root directory at the local station.
+* Increase maximum file size to 16384 bytes to take advantage
+  of the high compressibility of certain file types like text
+  when using the -z option in ARQ mode.
+* Fix bug where last-modifed date in shared files view not
+  correctly displayed when running on the 32-bit Cygwin platform.
+* Don't let pop-up dialog box change the status bar menu text.
+* Fix bug where the CTRL-X key combination not detected in the
+  inbox, outbox and sent messages views.
+* Update embedded Help and PDF Help file.
+
+Version 0.34
+------------
+* Message inbox viewer can now be opened during an ARQ session.
+  Press 'i' in ARQ mode to open the viewer and browse the message
+  inbox. The 'fm' command can be used to forward a message in the
+  list to the remote station, e.g. 'fm 5' (no destination callsign
+  is specified in ARQ mode, it's implicit).
+* Message outbox viewer can now be opened during an ARQ session.
+  Press 'o' in ARQ mode to open the viewer and browse the message
+  outbox. The 'sm' command can be used to send a message in the
+  list to the remote station, e.g. 'sm 5'. This can save time by
+  by allowing the operator to compose messages offline, then
+  establish an ARQ connection to another station and send them.
+* Sent messages viewer can now be opened during an ARQ session.
+  Press 's' in ARQ mode to open the viewer and browse the sent
+  messages mailbox. The 'fm' command can be used to forward a
+  message in the list to the remote station, e.g. 'fm 5' (no
+  destination callsign is specified in ARQ mode, it's implicit).
+* Shared files viewer can now be opened during an ARQ session.
+  Press 'f' in ARQ mode to open the viewer and browse the local
+  shared files directory. The 'sf' command can be used to send a
+  listed file to the remote station, e.g. 'sf 5' (no destination
+  callsign is specified in ARQ mode, it's implicit).
+* Expand shared files access by remote stations to subdirectories
+  the shared files directory. By default only the files in the
+  shared files root directory are accessible; any subdirectories
+  it contains are hidden. This is a secure default but it can be
+  limiting if you wish to organize shared files into multiple
+  directories contained in the root shared files directory. Now
+  additional directories can be exposed by specifying them in an
+  'add-files-dir' parameter in the [arim] section of the arim.ini
+  file. For example:
+       add-files-dir = forms/
+    This grants limited access to the 'forms' directory. The
+    files it contains may be listed or downloaded, but any
+    subdirectories are hidden.
+       add-files-dir = contests/*
+    The wildcard character '*' grants full access to the 'contests'
+    directory, including the entire hierarchy of subdirectories and
+    files rooted there. Directories such as 'contests/2017' or
+    'contests/2017/June' are accessible, along with the files they
+    contain.
+  The path specified by this parameter must be relative to the
+  shared files directory defined by the 'files-dir' configuration
+  file parameter. A maximum of 16 'add-files-dir' parameters can be
+  used. The max length is 255 characters. Default: None.
+* Extend the 'flist' command:
+  - File listings returned by 'flist' in FEC mode or '/flist' in
+    ARQ mode now include subdirectories made visible by an
+    'add-files-dir' parameter in the arim.ini configuration file.
+  - The flist command now accepts an optional subdirectory
+    parameter to allow "drilling down" into the shared files
+    hierarchy at the remote station, e.g. '/flist contests' or
+   '/flist contests/2017' if these paths are made visible by an
+   'add-files-dir' parameter in the arim.ini configuration file.
+* Add new command line switch:
+    -p FILE
+  or
+    --print-conf FILE
+  which prints a listing of successfully parsed configuration file
+  parameters to output file FILE when ARIM is started.
+* Fix bug where absolute paths assigned to the 'files-dir'
+  parameter in the [arim] section of the configuration file
+  didn't work.
+* Update man pages, embedded Help and PDF Help file.
+
+Version 0.33
+------------
+* Fix bug causing segmentation fault when issuing 'cd'
+  command without the expected numerical argument in the
+  shared files viewer.
+
+Version 0.32
+------------
+* Extend the shared files viewer to list subdirectories. This
+  allows listing, reading and forwarding files in all folders
+  nested under the root shared files folder, including the
+  'download' folder. Use the 'cd n' command to open a directory
+  and list its files.
+* Add column to files viewer showing the last-modified date for
+  files and directories.
+* Fix bug where files larger the the 'max-file-size' setting in
+  the arim.ini configuration file were not visible in the shared
+  files listing.
+* More gracefully abbreviate file names and paths too long to
+  fit in the shared files viewer window.
+* In the [arim] section of the configuration file, The default
+  'max-file-size' value is increased from 2048 to 4096.
+* Update embedded Help and PDF Help file.
+
+Version 0.31
+------------
+* Include man pages for arim: arim(1) which documents command
+  line options, and arim(5) which documents the arim.ini file.
+* Add new ARQ mode command '/sm' for sending a message to the
+  remote station. The message is automatically addressed to
+  the remote station callsign and sent to the inbox there.
+  Two forms can be used:
+     /sm message-text
+  or
+     /sm
+  If message text follows the command the message is immediately
+  transferred to the inbox at the remote station. Otherwise, the
+  message composer view opens. Enter the message line-by-line
+  at the command prompt. When done, enter '/ex' at the start of
+  a new line to close the composer view and send the message to
+  the inbox at the remote station. To cancel a message you've
+  started enter '/can' at the start of a new line to discard the
+  message and close the composer view.
+* New command line option '--config-file' (or '-f') allows you
+  to specify an alternate configuration file when invoking arim.
+  Use 'arim --help' to print out all command line options.
+* Improve error handling for /file, /fget and /fput commands
+  used in ARQ mode.
+* Bug fixes.
+
+Version 0.30
+------------
+* Switched to GNU build system. ARIM can be installed system-wide
+  if building from source. Alternatively, "portable" binary packages
+  can also be built local installation or distribution.
+* "Dynamic File" execution error log now rotated daily, and a
+  timestamped trace written to mark program start.
+* Bug fixes.
+
+Version 0.29
+------------
+* CRLF line endings now tolerated in arim.ini file. This prevents
+  problems caused by editing the .ini file in MS Windows text
+  editors that write CRLF line endings when saving the file.
+* Add option to reset the beacon timer when the station transmits
+  an ARDOP frame to prevent beacons from interfering with traffic
+  between stations, e.g. on a net. This is controlled by new
+  parameter 'reset-btime-on-tx' in the [tnc] section of the arim.ini
+  file. If TRUE the beacon timer is reset to 'btime' minutes when an
+  ARDOP frame is transmitted; if FALSE the beacon timer is not
+  reset. The default is FALSE.
+* Allow file names containing spaces to be specified when reading,
+  sending or receiving files.
+* Bug fixes.
+
+Version 0.28
+------------
+* Add current date and time to Title Bar.
+* Add command in message listing views to purge messages:
+  'pm d' where 'd' is the 'older-than' age in days.
+* Bug fixes.
+
+Version 0.27
+------------
+* File listings now include status flags: 'R' to indicate "message
+  read", 'F' to indicate "message forwarded" and 'S' to indicate
+  "message saved".
+* Added new command 'cf n fl' in message listing views. Use this to
+  clear status flags, where n is the message number, fl is the flag to
+  clear: R, F, S or * to clear all flags.
+* Added choice between UTC and local time for timestamps in the UI and
+  log file output. This is controlled by new parameter 'utc-time' in
+  the [ui] section of the arim.ini configuration file. If TRUE then
+  timestamps show UTC, if FALSE they show local time. The default is
+  TRUE.
+* Changed syntax for the 'last-time-heard' parameter in the [ui]
+  section of the arim.ini configuration file. Possible values are now
+  CLOCK and ELAPSED (CLOCK replaces UTC). If CLOCK, then the value of
+  parameter 'utc-time' selects between local time and UTC.
+* Introduce automatic purging of expired messages in mailboxes to
+  prevent unlimited growth in file size. This is controlled by a new
+  parameter, 'max-msg-days' in the [arim] section of the arim.ini
+  configuration file. Whenever a message listing view is opened (with
+  the li, lo or ls commands), the file is scanned and messages whose
+  age exceeds the limit are discarded. Set 'max-msg-days' to 0 to
+  disable automatic message purging.
+* Multiple netcalls can now be assigned to a TNC. This is for those
+  who need to copy messages directed to multiple netcalls over the
+  course of time, or for those who need to split a net into subnets.
+  - Configuration parameter 'netcall' in the [tnc] sections of the
+    arim.ini file can now be repeated up to 8 times. The default is
+    one netcall, QST.
+  - The syntax of the 'netcall' command at the ARIM command prompt has
+    changed to support adding or deleting a callsign from the list:
+      'netcall add call' to add a callsign to the list
+      'netcall del call' to delete a callsign from the list.
+    These changes persist until ARIM is closed. When reopened ARIM loads
+    the netcalls defined in the arim.ini file.
+  - The dialog box opened by the 'tncset' command shows the netcall list.
+  - Use the new 'netcalls' ARIM query to get the netcall list from a
+    remote station: 'sq call netcalls'.
+  - In an ARQ session, use the new '/netcalls' query to get the netcall
+    list from the connected station.
+* Bug fixes.
+
+Version 0.26
+------------
+* Bug fixes
+
+Version 0.25
+------------
+* Added new ARQ file transfer features. Use the '/fget' command during
+  an ARQ session to download a file from the remote station's shared
+  files folder. Any file, whether text or binary, can be transferred.
+  Files in a sub-folder of the shared files folder may also be
+  specified with a relative path, for example 'nets/rrnet.log'. Use
+  the '/fput' command to upload a file to the remote station. In both
+  cases the transferred file is stored in the receiving station's
+  'download' folder, which is a sub-folder of the shared files folder
+  defined in the [arim] section of the arim.ini config file. The ARQ
+  mode's binary file capability allows compressed file types such as
+  zip files to be used for more efficient file transfer over HF links.
+* Add 'input lockout' (!) and session bandwidth to ARQ status indicators.
+* Special command "!!" no longer stored to command history buffer.
+* Bug fixes.
+
+Version 0.24
+------------
+* Added new ARQ connection capability. Now ARIM can act as an ARQ
+  client or server, interoperating with ARDOP Chat or another ARIM
+  instance for keyboard to keyboard chat. ARIM may also be used as an
+  ARQ client to connect to a BPQ BBS using the ARDOP TNC. These new
+  commands are available:
+    'conn call n' where 'call' is callsign of remote station and 'n'
+      is max number of ARQ request repeats in the range 2-15. Use this
+      to initiate an ARQ session with another station.
+    'listen v' where 'v' is true or false. Use this to control whether
+      or not the TNC listens for ARQ connect requests or pings from
+      another station.
+    'arqto n' where 'n' is time in seconds. Use this to set connection
+      timeout.
+    'arqbw bw' where bw is one of:
+      200MAX, 500MAX, 1000MAX, 2000MAX,
+      200FORCED, 500FORCED, 1000FORCED, 2000FORCED.
+      Use this to set the connection bandwidth, either negotiated or
+      forced.
+    'arqset' shows ARQ settings in a pop-up dialog box. These settings
+      are controlled by .ini file entries.
+  If pilot pings are enabled they will apply to ARQ connection
+  requests, so that the RF path to the remote station can be tested in
+  advance. If the pilot pings fail, the connection attempt will be
+  cancelled. Once a connection is established, any text typed in the
+  command prompt will be transmitted to the remote station. Text sent
+  and received will be displayed in the traffic monitor view. If
+  connected to an ARIM station, the following query commands, prefixed
+  by the '/' character, can be entered at the prompt to retrieve
+  information from the remote station:
+    '/version' returns the software version numbers for ARIM and the
+      ARDOP TNC.
+    '/gridsq' returns the Maidenhead locator (gridsquare).
+    '/info' returns the ARIM info statement.
+    '/pname' returns the ARIM port 'name' for the TNC.
+    '/heard' returns the ARIM Calls Heard list.
+    '/flist' returns the ARIM shared files list.
+    '/file fn', where fn is a filename from the ARIM shared files
+      list. Prints the file to the traffic monitor.
+  To disconnect, press CTRL-X or type the special command '/dis' at
+  the command prompt and press ENTER. When connected to a remote
+  station, the command prompt is focussed on sending text and commands
+  to the remote station. The Recent Messages and Ping History views are
+  unavailable. Commands may not be directly to the TNC with the '!'
+  prefix, nor uproto FEC text sent with the ':' prefix.
+* Add new ARQ related parameters to the [tnc] section of the arim.ini
+  configuration file:
+    arq-bandwidth = bw where bw is one of: 200MAX, 500MAX, 1000MAX,
+    2000MAX, 200FORCED, 500FORCED, 1000FORCED, 2000FORCED. Default
+    is 2000MAX.
+    arq-timeout = n where n is the inactivity timeout in seconds, in
+      the range 30 to 600. Default is 120.
+    arq-sendcr = TRUE/FALSE controls whether or not a carriage return
+      character is appended to lines of text sent in an ARQ session.
+      Default is TRUE.
+* Command history buffer added to command prompt. Use the UP and DOWN
+  keys to browse the recent command history when you want to reuse a
+  previously sent command. The buffer holds the 15 most recently sent
+  commands. For those familiar with Linux command history recall, the
+  CTRL-P and CTRL-N keys can be used instead.
+* Add new 'enpingack v' command to control whether or not the TNC
+  responds to pings from another station, where 'v' is 'true' or
+  'false' (not case sensitive). Works with ARDOP TNC version 0.9.5 or
+  higher.
+* Add new parameters to the [tnc] section of the arim.ini the arim.ini
+  configuration file:
+    listen = TRUE/FALSE controls whether or not the TNC listens for
+      ARQ connect requests or PINGs from other stations. Default is TRUE.
+    enpingack = TRUE/FALSE controls whether or not the TNC responds to
+      pings from another station. Works with ARDOP TNC version 0.9.5 or
+      higher.
+  Note: if listen is false, then the TNC will not respond to pings
+  regardless of the enpingack setting.
+* Errors generated by dynamic file scripts are now written to a file
+  named "dyn-file-error.log" in the log folder.
+* Added commands to clear different parts of the screen:
+    'clrmon' clears the Traffic Monitor view.
+    'clrheard' clears the Calls Heard view.
+    'clrrec' clears the Recent Messages view.
+    'clrping' clears the Ping History view.
+* When attached to a TNC, the title bar now displays status for the
+  'enpingack' and 'arq-listen' TNC parameters. Format is [L:v E:v]
+  where 'L' is "Listen", 'E' is EnablePingAck and 'v' is either 'T'
+  (true) or 'F' (false).
+* Increased the size of the Traffic Monitor scrollback buffer to 500
+  lines.
+* Bug fixes.
+
+Version 0.23
+------------
+* If a message send fails for some reason, such as an ACK timeout or
+  negative pilot ping result, a dialog box now opens and offers to
+  save the message to the Outbox rather than discard it. Answer yes if
+  you plan to send the message at a later time and wish to avoid the
+  trouble of typing it in again.
+* Basic line editing features added to the command prompt. The left
+  and right arrow keys, HOME, END and DEL keys now work as expected.
+  Together with the backspace key it's now easier to correct mistakes
+  in typing, whether a entering a command or composing a message. For
+  those familiar with the Emacs style line editing common in Linux:
+  CTRL-A, CTRL-E, CTRL-F, CTRL-B, CTRL-D, CTRL-K and CTRL-U can be
+  used instead.
+* The Inbox Listing now refreshes automatically when new messages are
+  received.
+* In file and message listing views a status bar message now warns if
+  the operator enters a command at the prompt which is not available
+  in those views.
+* Bug fixes.
+
+Version 0.22
+------------
+* Bug fixes.
+
+Version 0.21
+------------
+* Add new 'ping' command for use with ARDOP TNC version 0.9.4 and
+  higher. This initiates a PING transmission to another station and
+  processes the response (ping ack) if received. Format: 'ping c n'
+  where 'c' is callsign and 'n' is number of repeats.
+* Add new "Ping History" view. Press 'p' to open the view. This
+  displays a history of pings sent to your station and pings received
+  by your station, organized in reverse chronological order. A row
+  appears for each station to which pings have been sent or received.
+  This displays the S/N and Quality numbers and a timestamp for the
+  most recent ping reports either sent to or received from that
+  station. When this view is visible, press 'd' to scroll down and 'u'
+  to scroll up. Press 't' to toggle timestamps between UTC (format
+  HH:MM:SS) and elapsed time (format DD:HH:MM).
+* Add new Pilot Ping feature, which sends pings in advance of message
+  or query transmissions to judge the quality of the RF path to the
+  destination station. If the quality is below a user set threshold
+  then the transmission is cancelled. These new commands are
+  available: 'pping n' where 'n' is the number of ping repeats (2-5).
+  'ppthr n' where 'n' is the quality threshold (50-100). 'ppset'
+  shows pilot ping settings in a pop-up dialog box. Set 'pping' to 0
+  to disable pilot pings.
+* Add new ping related parameters to the [arim] section of the
+  arim.ini configuration file: pilot-ping = n where n is the number of
+  ping repeats in range 2 to 5. The default is 0 (pilot pings
+  disabled). pilot-ping-thr = n where n is quality threshold in range
+  50 to 100. The default is 60.
+* Monitor view displays ping traffic; outbound pings are frame type
+  [P] and inbound ping acks are frame type [p].
+* Add scrolling support to "Recents" view. Press 'd' to scroll down
+  and 'u' to scroll up.
+* Bug fixes.
+
+Version 0.20
+------------
+* Add ARIM/TNC state indicator to status bar. Format is I/B:T/R where
+  ARIM state is either I (idle) or B (busy), and TNC state is either T
+  (transmitting) or R (receiving). When ARIM is busy, pressing the ESC
+  key cancels the current operation so that a new transmission can be
+  started immediately. Improve reporting of protocol states in the
+  status bar.
+* Add new 'rr' (read recent) command. This is available when the
+  Recents view is open and allows the operator to read a recent
+  message immediately without opening the message inbox list view.
+* No ACK is expected when a message to sent to the net call, ARIM
+  returns to the idle state immediately after sending.
+* Bug fixes.
+
+Version 0.19
+------------
+* Block message, query and unproto transmissions while the TNC is busy
+  sending or receiving ARIM frames. In either case, pressing the ESC
+  key cancels the current operation so that a new transmission can be
+  started immediately.
+* When sending a message, if the TNC is busy, store the message in the
+  outbox rather than discard it.
+* ARIM frame send and receive events are now announced by a message on
+  the status bar, including wait states and frame receive time outs.
+  Also, report when attempts to send messages and queries are blocked
+  due to busy TNC.
+* Bug fixes.
+
+Version 0.18
+------------
+* Make changes to take advantage of improved TNC parameter update
+  protocol in Host interface introduced in ARDOP TNC v0.9.0. This
+  breaks compatibility with older ARDOP TNC versions, use only with
+  TNC v0.9.0 or higher!
+* Add new 'tncset' command which displays a pop-up dialog with current
+  TNC settings.
+* Add new 'mycall', 'netcall', 'gridsq' and 'pname' commands, mainly
+  for testing purposes but perhaps useful for quick on-the-fly changes
+  when operating.
+* Bug fixes.
+
+Version 0.17
+------------
+* Adapt to changes in ARDOP TNC Host Interface introduced in ARDOP_Win
+  v0.9.0 affecting TNC parameter updates.
+
+Version 0.16
+------------
+* Make changes to accommodate 10 character callsigns in the calls
+  heard list, message headers and configuration file.
+* Increase max length of grid square parameter from 6 to 8.
+* Bug fixes.
+
+Version 0.15
+------------
+* Implement color highlighting UI option, controlled by the
+  'color-code' parameter in the [ui] section of the configuration
+  file. In the monitor view and calls heard list:
+  - Traffic sent by or addressed to the TNC call is color coded: green
+    for [M] and [A] frames, yellow for [Q] and [R] frames, red for [N]
+    or [E] frames.
+  - Traffic addressed to the net call is color coded cyan for [M]
+    frames or red for [E] and [!] frames.
+  - [B] (beacon) frames are color coded magenta.
+  - [I] (ARDOP ID) frames are color coded blue.
+  - Monitored [M], [A], [Q], [R] and [N] frames not addressed to the
+    TNC call or net call are color coded white.
+  In the TNC command view:
+  - Commands sent to TNC by host are color coded cyan.
+  - Async responses sent to host by TNC are color coded: red for PTT
+    TRUE, green for PTT FALSE, yellow for BUFFER responses, magenta
+    for BUSY responses and white for others.
+* Implement 'info' query. The response contains the contents of the
+  'info' parameter in the [tnc] section of the config file for the
+  current TNC. Max length is 127 characters. To indicate a line break
+  in the info text use the character pair "\n". This will be converted
+  into a newline character in the response message.
+* Expand debug log output to include ARDOP and ARIM frame reception
+  traces.
+* Bad ARIM frames now tagged with [!] identifier to distinguish them
+  from bad ARDOP frames (with the [E] tag) in the monitor view and
+  logs. [!] frames may be bad because parsing failed (e.g. a timeout
+  due to lost ARDOP frame) or because the checksum test at the ARIM
+  protocol level failed.
+* Bug fixes.
+
+Version 0.14
+------------
+* Pressing the 't' key now switches the Calls Heard list timestamp
+  format between time last heard (LT) and elapsed time since last
+  heard (ET).
+* Bug fixes.
+
+Version 0.13
+------------
+* Introduce option to progressively "downshift" the FEC mode each time
+  a message transmission is repeated when the 'send-repeats' option is
+  invoked. This is controlled by the new 'fecmode-downshift'
+  parameter in the [arim] section of the configuration file. If
+  'fecmode-downshift' is TRUE and 'send-repeats' is nonzero, then a
+  more robust FEC mode is used for re-transmissions after a NAK or
+  timeout. The strategy is to move to the next member of the same
+  modulation family that uses less bandwidth. The mode of last resort
+  is 8FSK.200.25. For example, if the initial mode is 8PSK.2000.100,
+  then downshifting would progress to 8PSK.1000.100, then
+  8PSK.500.100, and so on. The original FEC mode is restored after the
+  message send operation completes. This is experimental. There are
+  many kinds of channel impairments and no single downshift strategy
+  is best for all. For details look at the FEC mode downshift table in
+  the msg.c source code file.
+* Add new commands to control message send repeat behavior "on the
+  fly" so the operator can adapt to changing conditions:
+  - srpts: sets the number of send repeats, 0 disables repeating.
+  - ackto: sets the message ack timeout in seconds.
+  - fecds: enables/disables FEC mode downshifting when repeating.
+  - srset: shows the send repeat settings in a pop-up dialog.
+  To access these, press the spacebar to open the command prompt and
+  enter, e.g. 'srpts 3' or 'fecds true'. Usually you'll want to set
+  srpts to 0 before sending a message to a net call because recipients
+  don't ack messages addressed their net call.
+* Pressing the <ESC> key cancels any pending message repeats besides
+  terminating a transmission in progress.
+* The response to the 'heard' query now indicates whether the last
+  time heard is UTC time (LT) or elapsed time (ET).
+* Bug fixes.
+
+Version 0.12
+------------
+* Add optional UI view titles, controlled by 'show-titles' parameter
+  in [ui] section of configuration file. Enabled by default.
+* Outbound entries in the monitor and TNC command views now bolded to
+  make them stand out.
+* When 'q' pressed to quit ARIM a confirmation dialog now appears to
+  protect against accidental program close.
+* Add option for Heard List entries to have elapsed time indicated
+  instead of UTC time heard. Format is DD:HH:MM. This is controlled
+  by 'last-heard-time' parameter in [ui] section of the configuration
+  file. Possible values are 'ELAPSED' and 'UTC'.
+* Add "sent messages" feature. All messages sent or forwarded are
+  stored in the sent messages mbox. Use the 'ls' command to show them
+  in the sent messages list view, where they may be read, killed,
+  saved to file or fowarded to another station.
+* Bug fixes and minor UI enhancements.
+
+Version 0.11
+------------
+* Add status bar indicators for current FECMODE and FECREPEAT count
+  with format <mode>:<repeat>, to left of beacon indicator.
+* Bug fixes.
+
+Version 0.10
+------------
+* Bug fixes.
+
+Version 0.9
+-----------
+* Introduce "dynamic files". These are defined in 'dynamic-file'
+  entries in the [arim] section of the arim.ini configuration file.
+  Dynamic files are used to return dynamic content in response to a
+  file query of the form 'sq file filename'. The command that is run
+  can be a batch file, a system command or a script. See the
+  "Configuration" topic in the Help for details.
+* The response to the 'flist' query now includes any dynamic files
+  defined in the configuration file.
+* Setting "max-file-size" parameter to 0 in [arim] section of arim.ini
+  configuration file disables access to shared files, including
+  dynamic files.
+* Bug fixes.
+
+Version 0.8
+-----------
+* Bug fixes.
+
+Version 0.7
+-----------
+* Initial public release.
+
+

@@ -1,0 +1,404 @@
+
+.TH "ARIM" 5 "2021-02-21" "ARIM Messaging Program" "arim"
+.SH NAME
+arim - related files
+.SH FILES
+\fI${HOME}/arim/arim.ini\fR
+.PP
+This is an "INI File" format configuration file for ARIM, which is read on program start up. It is divided into \fBsections\fR, each containing a list of \fBkeys\fR which specify program properties as name=value pairs, one to a line. Section names occupy a line by themselves and are enclosed in square brackets. Lines beginning with the '#' character are treated as comments. If a key is not present in the file the property is set to its default value. The following sections and keys are defined:
+.TP
+\fB[tnc]\fR
+Each ARDOP TNC is configured in a separate [tnc] section. The first [tnc] section in the file defines port 1, the second port 2, and so on. The limit is 10 TNC definitions.
+.RS 7
+.TP
+\fBinterface\fR
+The TNC interface type, either TCP for connecting to a software TNCs like ardop2 or ARDOP_2Win, or SERIAL for connecting to the TNC-Pi9K6 hardware TNC. Default: TCP.
+.TP
+\fBipaddr\fR
+The IPv4 address of the TNC, either in "dotted quad" numerical form or a host name e.g. "localhost" or "DELL-1520.example.net". Max length for host names is 253 characters. Default: 127.0.0.1. NOTE: on hosts with IPv6 enabled, 'localhost' may not work as the address for an ARDOP instance running on the same host. Use the IPv4 address of the host or the IPv4 loopback address "127.0.0.1" instead. The IPv4 address can be discovered by running the \fIipconfig\fR program from the command line. If running ARDOP_Win or ARDOP_2Win, set this address in the "Virtual TNC Setup" dialog box as well.
+.TP
+\fBport\fR
+The TCP port on which the TNC is listening. Default: 8515.
+.TP
+\fBserial-port\fR
+The serial port device name, for example /dev/serial0, used to connect to the TNC-Pi9K6 hardware TNC on a Raspberry Pi host. Max length for device names is 63 characters. Default: /dev/serial0.
+.TP
+\fBserial-baudrate\fR
+The baud rate for the serial port used to connect to the TNC-Pi9K6 hardware TNC, either 9600, 19200, 38400, 57600 or 115200. Default: 115200.
+.TP
+\fBmycall\fR
+The station callsign, e.g. NW8L or NW8L-4, max length 10 characters. Call must be no longer than 7 characters and may have optional SSID in ranges: -A to -Z or -0 to -15. ARIM will respond to queries and messages addressed to this call. Messages will be stored in the inbox. Default: NOCALL.
+.TP
+\fBnetcall\fR
+A net callsign, e.g. RRNET, max length 10 characters. Any printable characters are allowed. When sending a message to this call, no ACK is expected. When receiving, ARIM will recognize messages addressed to this call and store them in the inbox but no ACK will be returned to prevent channel congestion. ARIM will not respond to queries addressed to the net call. Starting with ARIM v0.27, up to 8 net callsigns may be defined for a TNC. Default: one netcall, QST.
+.TP
+\fBgridsq\fR
+The station's grid square locator. It must be a well formed Maidenhead locator, either 4, 6 or 8 characters long. For example: DM65 or DM65qf or DM65qf15. Letter pairs are not case-sensitive. Default: DM65.
+.TP
+\fBbtime\fR The beacon interval time in minutes, or 0 to disable the beacon. Max time is 999 minutes. Default: 0.
+.TP
+\fBreset-btime-on-tx\fR
+Controls whether or not the beacon timer is reset when the station transmits an ARDOP frame. This is useful to prevent beacon transmissions from interfering with traffic between stations, e.g. on a net. This setting has no effect when the beacon is disabled. Set to TRUE to enable beacon timer reset on transmit, FALSE to disable it. Default: FALSE.
+.TP
+\fBname\fR
+A name assigned to the TNC and advertised by the beacon, e.g. RRNET/ARIM. This is also returned when the TNC receives the ARIM 'pname' query. Max length is 31 characters. Default: Empty.
+.TP
+\fBinfo\fR
+Information describing the TNC, returned in response to the 'info' query. Use the character pair \n to indicate a line break if you want to format the text into multiple lines; this will be converted to a newline character in the response. Max length is 127 characters. Default: Empty.
+.TP
+\fBfecmode\fR
+The initial ARDOP FECMODE. This is the frame type, in the format modulation.bandwidth.baudrate. Max length is 20 characters. Default: 4PSK.200.50. Available modes are:
+.PP
+.RS
+\fBARDOP v1.x\fR 4FSK.200.50S, 4FSK.500.100S, 4FSK.500.100, 4FSK.2000.600S, 4FSK.2000.600, 4PSK.200.100S, 4PSK.200.100, 8PSK.200.100, 4PSK.500.100, 8PSK.500.100, 4PSK.1000.100, 8PSK.1000.100, 4PSK.2000.100, 8PSK.2000.100, 16QAM.200.100, 16QAM.500.100, 16QAM.1000.100 or 16QAM.2000.100.
+.PP
+\fBARDOP v2.x\fR 4PSK.200.50, 4PSK.200.100, 16QAM.200.100, 4FSK.500.50, 4PSK.500.50, 16QAMR.500.100, 16QAM.500.100, 4FSK.1000.50, 4PSKR.2500.50, 4PSK.2500.50, 16QAMR.2500.100 or 16QAM.2500.100.
+.RE
+.TP
+\fBfecrepeats\fR
+The initial ARDOP FECREPEATS value. This is the number of times each FEC frame will be repeated by the sender. This may be useful when propagation is poor, but at thecost of reduced throughput - depending on FEC mode, an ARIM frame may extend across multiple ARDOP FEC frames, each of which will be repeated. Max value is 5. Default: 0.
+.TP
+\fBfecid\fR
+The initial ARDOP FECID value, which controls whether or not an ARDOP ID frame is sent by the TNC at the start of FEC transmissions. Set to TRUE to enable FECID, FALSE to disable it. Default: FALSE.
+.TP
+\fBleader\fR
+The initial ARDOP LEADER time in msec. The leader is a special 50 baud two tone signal which precedes data transmission, used by the receiving TNC for synchronization. This may need to be adjusted to compensate for loss of leader due to delays in PTT or VOX keying or audio path latencies in some SDR radios. Range is 120-2500. Default: 240.
+.TP
+\fBtrailer\fR
+The initial ARDOP TRAILER time in msec. Range is 0-200. Non-zero trailer time is only needed for certain SDR radios and is a function of the audio processing latency relative to release of PTT. For these cases try a value of 100-200 msec. Default: 0.
+.TP
+\fBsquelch\fR
+The initial ARDOP SQUELCH setting. This controls the sensitivity of the TNC's leader detector. Lower values mean greater sensitivity but also greater risk of false triggering. Range is 1-10. Default: 5.
+.TP
+\fBbusydet\fR
+The initial ARDOP BUSYDET setting. This controls the sensitivity of the TNC's busy detector. Lower values mean greater sensitivity but also greater risk of false triggering. Setting the value to 0 disables the busy detector. The busy detector should be disabled only in an emergency situation or in very high local noise environments. Range is 0-10. Default: 5.
+.TP
+\fBlisten\fR
+Controls whether or not the TNC listens for ARQ connect requests or pings from other stations. Set to TRUE to enable listening, FALSE to disable it. Default: TRUE.
+.TP
+\fBenpingack\fR
+Controls whether or not the TNC responds to pings from other stations. Set to TRUE to enable ping ACKs, FALSE to disable them. Default: TRUE. Note: works only with ARDOP TNC version 0.9.5 or higher.
+.TP
+\fBtnc-init-cmd\fR
+Specifies a TNC initialization command to send when ATTACHING to a TNC. For example:
+.PP
+.RS
+tnc-init-cmd = LEADER 300
+.PP
+This is useful for passing TNC commands which are not managed by ARIM, such as (future) radio control commands, and for TNC test and development purposes. Commands are send verbatim without validation of the command name or its parameters. Max length is 128 characters. You may define no more than 32 \fItnc-init-cmd\fR parameters. Default: None.
+.RE
+.TP
+\fBarq-bandwidth\fR
+Sets the ARQ connection bandwidth. Default: 500. Available bandwidths are:
+.PP
+.RS
+\fBARDOP v1.x\fR 200MAX, 500MAX, 1000MAX, 2000MAX, 200FORCED, 500FORCED, 1000FORCED or 2000FORCED.
+.PP
+\fBARDOP v2.x\fR 200, 500 or 2500.
+.RE
+.TP
+\fBarq-timeout\fR
+The inactivity timeout for ARQ connections in seconds. Range is 30-600. Default: 120.
+.TP
+\fBarq-negotiate-bw\fR
+Controls whether or not the TNC will negotiate ARQ bandwidth for incoming connections. Set to TRUE to enable, FALSE to disable. Default: TRUE.
+.TP
+\fBarq-sendcr\fR
+Controls whether or not CRLF line endings are sent in ARQ mode, instead of Unix style LF endings. Set to TRUE to send CR, FALSE to send only LF. Default: TRUE.
+.TP
+\fBlog-dir\fR
+The directory where log files are located if TNC specific logging is enabled. This can be an absolute path or a relative path rooted in the user's home directory. Max length is 255 characters. Default: the user's home directory.
+.TP
+\fBdebug-log\fR
+Set to TRUE to enable debug logging for this TNC in the directory specified by the \fIlog-dir\fR parameter, FALSE to disable it. Default: FALSE.
+.TP
+\fBtraffic-log\fR
+Set to TRUE to enable traffic logging for this TNC in the directory specified by the \fIlog-dir\fR parameter, FALSE to disable it. Default: FALSE.
+.TP
+\fBtncpi9k6-log\fR
+Set to TRUE to enable TNC-Pi9K6 debug logging for this TNC in the directory specified by the \fIlog-dir\fR parameter, FALSE to disable it. Default: FALSE.
+.RE
+.TP
+\fB[arim]\fR This section holds settings for the ARIM messaging protocol.
+.RS
+.TP
+\fBmycall\fR
+The callsign used as the "from" address for messages stored in the outbox when not attached to a port. Default: NOCALL.
+.TP
+\fBsend-repeats\fR
+The number of times an ARIM message will be repeated in the absence of an ACK response from the recipient. It is recommended that this value not exceed 3to prevent tying up the channel with repeats in poor conditions. Default: 0.
+.TP
+\fBack-timeout\fR
+The maximum time in seconds after sending a message that ARIM will wait for an ACK before repeating it. Applies when send-repeats is not 0. Max is 999 seconds. Default: 30.
+.TP
+\fBfecmode-downshift\fR
+Controls whether or not the FEC mode is progressively "downshifted", or changed to a more robust mode each time an ARIM message is repeated after a NAK or ACK timeout. Set to TRUE to enable, FALSE to disable downshifting. Default: FALSE.
+This works in tandem with the 'send-repeats' parameter. If 'fecmode-downshift' is TRUE and 'send-repeats' is nonzero, then progressively more robust FEC modes are used for re-transmissions after a NAK or timeout. The mode of last resort is 4PSK.200.50. For example, if the initial mode is 4PSK.500.100, then downshifting would progress to 4FSK.500.100, then 16QAM.200.100, and so on. The original FEC mode is restored after the message send operation completes. This is experimental. There are many kinds of channel impairments and no single downshift strategy is best for all. For details look at the FEC mode downshift table in the \fIarim_proto.c\fR source code file.
+.TP
+\fBframe-timeout\fR
+The time in seconds after which an incomplete ARIM frame will be abandoned and the receive buffer cleared. Because an ARIM frame may be spread over many ARDOP frames, a failure to receive one or more ARDOP frames will cause an ARIM timeout. Max is 999 seconds. Default: 30.
+.TP
+\fBfiles-dir\fR
+The directory in which files available for other stations to read are located. This can be an absolute path or a relative path rooted in the ARIM working directory and must be terminated with a '/' character. Max length is 255 characters. Default: files/
+.TP
+\fBadd-files-dir\fR
+Specifies an additional shared files directory accessible to remote stations. This must be a path relative to the shared files root directory specified by the \fIfiles-dir\fR parameter. By default, only files in the shared files root directory may be listed or downloaded, and any directories it contains are hidden. If you need to share files organized into multiple directories, use the \fIadd-files-dir\fR parameter to expose them. For example:
+.PP
+.RS
+add-files-dir = forms/
+.PP
+This allows limited access to the 'forms' directory in the shared files root directory. A remote station may list, read or downloaded the files it contains, but any subdirectories are hidden. To grant full access to a directory, including the hierarchy of files and subdirectories rooted there, append the '*' wildcard character to the end of the path. For example:
+.PP
+add-files-dir = contests/*
+.PP
+This grants full access to the 'contests' directory in the shared files root directory. This exposes not only the files in 'contests', but also the hierarchy of subdirectories rooted there. Subdirectories such as contests/2017 or contests/2017/June are visible, and a remote station may list and download the files they contain.
+.PP
+Max length is 255 characters. NOTE: You may define no more than 16 \fIadd-files-dir\fR parameters. Default: None.
+.RE
+.TP
+\fBac-files-dir\fR
+Specifies an access-controlled shared files directory accessible only to remote stations that are \fIauthenticated\fR in an ARQ session. This must be a path relative to the shared files root directory specified by the \fIfiles-dir\fR parameter. File path syntax is the same as for the \fIadd-files-dir\fR parameter.
+.RS
+.PP
+Max length is 255 characters. NOTE: You may define no more than 16 \fIac-files-dir\fR parameters. Default: None.
+.RE
+.TP
+\fBac-allow\fR
+Specifies a list of remote station call signs which are allowed access to the local station. \fIOnly\fR these stations can make ARQ connections or send FEC messages and queries. \fBac-allow\fR parameters take precedence over \fBac-deny\fR parameters, which are ignored if non-empty \fBac-allow\fR parameters exist. Call signs must be separated by commas (whitespace is tolerated). You can use a wildcard (*) character at the end of a call sign to include tactical call variations, e.g. NW8L* will match NW8L, NW8L-1, NW8L-2 etc. For example:
+.PP
+.RS
+ac-allow = W1AW, NW8L*, KA8RYU-1
+.PP
+Max length is 255 characters. Zero or more \fBac-allow\fR parameters are allowed. If multiple \fBac-allow\fR parameters are present then their contents are combined. The total number of call signs is limited to 512.  Default: None.
+.RE
+.TP
+\fBac-deny\fR
+Specifies a list of remote station call signs which are denied access to the local station. These stations are \fInot\fR allowed to make ARQ connections or send FEC messages and queries. ARIM immediately disconnects from inbound ARQ connections from these stations, and ignores any FEC messages and queries sent by them. \fBac-allow\fR parameters take precedence over \fBac-deny\fR parameters, which are ignored if non-empty \fBac-allow\fR parameters exist. Call signs must be separated by commas (whitespace is tolerated). You can use a wildcard (*) character at the end of a call sign to include tactical call variations, e.g. NW8L* will match NW8L, NW8L-1, NW8L-2 etc. For example:
+.PP
+.RS
+ac-deny = W1AW, NW8L*, KA8RYU-1
+.PP
+Max length is 255 characters. Zero or more \fBac-deny\fR parameters are allowed. If multiple \fBac-deny\fR parameters are present then their contents are combined. The total number of call signs is limited to 512. Default: None.
+.RE
+.TP
+\fBmax-file-size\fR
+The maximum size of files that can be transferred in an ARIM message. In ARQ mode, this is the size \fBafter\fR file compression. In FEC mode, the output of the flist query is filtered in accordance with this limit; files larger than \fBmax-file-size\fR are ignored. To disable access to shared files, set this to 0. Max is 16384 bytes. Default: 4096.
+.TP
+\fBdynamic-file\fR
+A dynamic file definition of the form alias:command where alias is a "dummy" file name used to invoke the command command, with a colon ':' separating the two, for example:
+.PP
+.RS
+spwxfc:python /home/nw8l/scripts/forecast.py
+.PP
+Use absolute paths to script files when ARIM is built from source and installed. Relative paths can be used for "portable" binary installations where the script files are contained in same directory as the arim executable file. Dynamic files are used to return the output of a script or system command in response to a file query. alias must be unique among any other dynamic file definitions and file names in the shared files folder. In response to the query sq file alias, command will be executed in a shell and its output returned in the response. command can be a batch file, a script invocation like python myscript or a system command like date or uname -a. The output size in bytes is limited by the max-file-size parameter. Errors generated by dynamic file scripts are written to a file named dyn-file-error-YYYYMMDD.login the log folder. Max length is 128 characters. NOTE: you may define no more than 16 dynamic-file parameters. Default: None.
+.RE
+.TP
+\fBpilot-ping\fR
+The number of times a pilot ping will be repeated in the absence of a PINGACK response from the recipient. It is recommended that this value not exceed 3 to prevent tying up the channel with repeats in poor conditions. Set to 0 to disable pilot pings; otherwise the range is 2-15. Default: 0.
+.TP
+\fBpilot-ping-thr\fR
+When pilot pings are enabled, this is the threshold by which signal reports from the target station are judged. If the reported constellation quality is above the threshold, the message (or query) send proceeds; if below this threshold it is cancelled. It is recommended that this value be 60 or higher; choose a threshold suitable for the FEC mode in use. Min is 50, Max is 100. Default: 60.
+.TP
+\fBmax-msg-days\fR
+The maximum age, in days, for messages to be kept in the inbox, outbox and sent messages mailbox. Messages that exceed this limit are automatically purged whenever ARIM is started. Set to 0 to disable the automatic message purge feature. Default: 0.
+.TP
+\fBmsg-trace-en\fR
+Set to TRUE to enable message tracing, FALSE to disable it. Default: FALSE. When enabled, headers like \fBReceived: from KA8RYU by NW8L; Jan 30 2019 05:01:48 UTC\fR are inserted into messages at the time of receipt. If the message is forwarded to another station with tracing enabled, another \fBReceived:\fR header is added by the receiving station, and so on. In this way a record of the message's progress through a network is built up as it is forwarded from station to station (read from bottom to top).
+.RE
+.TP
+\fB[log]\fR Default logging settings appear in this section.
+.RS
+.TP
+\fBdebug-log\fR
+Set to TRUE to enable debug logging in the default log directory, FALSE to disable it. Default: FALSE. May be overridden by the \fIdebug-log\fR setting in a [tnc] section.
+.TP
+\fBtraffic-log\fR
+Set to TRUE to enable traffic logging in the default log directory, FALSE to disable it. Default: TRUE. May be overridden by the \fItraffic-log\fR setting in a [tnc] section.
+.TP
+\fBtncpi9k6-log\fR
+Set to TRUE to enable TNC-Pi9K6 debug logging in the default log directory, FALSE to disable it. Default: TRUE. May be overridden by the \fItncpi9k6-log\fR setting in a [tnc] section.
+.RE
+.TP
+\fB[ui]\fR User interface settings appear in this section.
+.RS
+.TP
+\fBcolor-code\fR
+Set to TRUE for color coding of items in the traffic monitor view, calls heard list and TNC command view according to the scheme discussed in the Color Coded Display section. Set to TRUE to enable, FALSE to disable color coding. Default: TRUE.
+.TP
+\fBshow-titles\fR
+Set to TRUE to show titles for all views (panes) in the UI, FALSE to hide them. Default: TRUE.
+.TP
+\fBlast-time-heard\fR
+Selects the calls heard list timestamp format. Set to CLOCK to indicate time station was last heard, in HH:MM:SS format (either local time or UTC). Set to ELAPSED to indicate elapsed time since station last heard, in DD:HH:MM format. Default: CLOCK.
+.TP
+\fBmon-timestamp\fR
+Set to TRUE to enable timestamps in the traffic monitor view. Set to FALSE to disable them. Default: FALSE. Prior to version 0.12 this was located in the [arim] section.
+.TP
+\fButc-time\fR
+Selects the time zone used for timestamps in the UI and log output, and for the clock in the title bar. Set to TRUE for UTC, and FALSE for local time. Default: TRUE.
+.TP
+\fBtheme\fR
+The UI theme, either one of the built-in themes (DARK or LIGHT) or a custom theme defined in the \fIarim-themes\fR file described below. Default: DARK.
+.TE
+.RE
+.PP
+\fI${HOME}/arim/arim-themes\fR
+.PP
+This is an "INI File" format definition file which is read on program start up. It contains user defined UI theme definitions which augment the built-in "DARK" and "LIGHT" themes. The file is divided into \fBsections\fR, each containing a list of \fBkeys\fR which specify theme properties as name=value pairs, one to a line. Section names occupy a line by themselves and are enclosed in square brackets. Lines beginning with the '#' character are treated as comments. If a key is not present in the file the property is set to its default value. The following sections and keys are defined:
+.TP
+\fB[theme]\fR
+Each theme is configured in a separate [theme] section. This is a group of color and text attribute assignments for various UI elements in ARIM. The allowable colors are:
+BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, and WHITE. What you see will vary with the color palette used by your terminal emulator. The allowable text attributes are: BLINK, BOLD, DIM, ITALIC, NORMAL, REVERSE, STANDOUT and UNDERLINE. Not all of these attributes work on a given terminal type; you'll need to experiment with them. Up to 5 themes can be defined. Example themes are included in the distributed \fIarim-themes\fR file.
+.RS
+.TP
+\fBname\fR
+The name of the theme. Maximum length: 15 characters.
+.TP
+\fBui-background-color\fR
+The background color used everywhere except dialog boxes. Default: WHITE.
+.TP
+\fBui-dialog-background-color\fR
+The background color used in dialog boxes. Default: WHITE.
+.TP
+\fBui-dialog-attr\fR
+The text attribute for text in dialog boxes. Default: NORMAL.
+.TP
+\fBui-default-color\fR
+The default color for traces printed in the TRAFFIC MONITOR view not otherwise defined. Default: BLACK.
+.TP
+\fBui-default-attr\fR
+The default text attribute for traces printed in the TRAFFIC MONITOR view not otherwise defined. Default: NORMAL.
+.TP
+\fBui-status-indicator-color\fR
+The color for the "status indicators" section of the status bar. Default: BLACK.
+.TP
+\fBui-status-indicator-attr\fR
+The text attribute for the "status indicators" section of the status bar. Default: NORMAL.
+.TP
+\fBui-status-notify-color\fR
+The color for notification messages that temporarily replace the menu on the status bar. Default: BLACK.
+.TP
+\fBui-status-notify-attr\fR
+The text attribute for notification messages that temporarily replace the menu on the status bar. Default: NORMAL.
+.TP
+\fBui-clock-color\fR
+The color for the clock on the title bar. Default: BLACK.
+.TP
+\fBui-clock-attr\fR
+The text attribute for the clock on the title bar. Default: NORMAL.
+.TP
+\fBui-msg-cntr-color\fR
+The color for the new messages/files counter on the title bar. Default: BLACK.
+.TP
+\fBui-msg-cntr-attr\fR
+The text attribute for the new messages/files counter on the title bar. Default: NORMAL.
+.TP
+\fBui-ch-busy-color\fR
+The color for the "CHANNEL BUSY" indicator on the status bar. Default: BLACK.
+.TP
+\fBui-ch-busy-attr\fR
+The text attribute for the "CHANNEL BUSY" indicator on the status bar. Default: NORMAL.
+.TP
+\fBui-title-color\fR
+The color for the title text centered in the title bar. Default: BLACK.
+.TP
+\fBui-title-attr\fR
+The text attribute for the title text centered in the title bar. Default: NORMAL.
+.TP
+\fBtm-err-color\fR
+The color used for ARIM and ARDOP error frames printed in the TRAFFIC MONITOR view, e.g. [E] or [X] tags. Default: BLACK.
+.TP
+\fBtm-err-attr\fR
+The text attribute for ARIM and ARDOP error frames printed in the TRAFFIC MONITOR view, e.g. [E] or [X] tags. Default: NORMAL.
+.TP
+\fBtm-message-color\fR
+The color used for ARIM message frames printed in the TRAFFIC MONITOR view, [M] or [A] tags. Default: BLACK.
+.TP
+\fBtm-message-attr\fR
+The text attribute for ARIM message frames printed in the TRAFFIC MONITOR view, [M] or [A] tags. Default: NORMAL.
+.TP
+\fBtm-net-color\fR
+The color used for ARIM "net" message frames printed in the TRAFFIC MONITOR view, [M] tag. Default: BLACK.
+.TP
+\fBtm-net-attr\fR
+The text attribute for ARIM "net" message frames printed in the TRAFFIC MONITOR view, [M] or [A] tags. Default: NORMAL.
+.TP
+\fBtm-query-color\fR
+The color used for ARIM query frames printed in the TRAFFIC MONITOR view, [Q] or [R] tags. Default: BLACK.
+.TP
+\fBtm-query-attr\fR
+The text attribute for ARIM query frames printed in the TRAFFIC MONITOR view, [Q] or [R] tags. Default: NORMAL.
+.TP
+\fBtm-beacon-color\fR
+The color used for ARIM beacon frames printed in the TRAFFIC MONITOR view, [B] tag. Default: BLACK.
+.TP
+\fBtm-beacon-attr\fR
+The text attribute for ARIM beacon frames printed in the TRAFFIC MONITOR view, [B] tag. Default: NORMAL.
+.TP
+\fBtm-arq-color\fR
+The color used for ARDOP ARQ frames printed in the TRAFFIC MONITOR view, [@] tag. Default: BLACK.
+.TP
+\fBtm-ping-attr\fR
+The text attribute for ARDOP ARQ frames printed in the TRAFFIC MONITOR view, [@] tag. Default: NORMAL.
+.TP
+\fBtm-ping-color\fR
+The color used for ARDOP PING and PINGACK frames printed in the TRAFFIC MONITOR view, [P] or [p] tags. Default: BLACK.
+.TP
+\fBtm-ping-attr\fR
+The text attribute for ARDOP PING and PINGACK printed in the TRAFFIC MONITOR view, [P] or [p] tags. Default: NORMAL.
+.TP
+\fBtm-id-color\fR
+The color used for ARDOP ID frames printed in the TRAFFIC MONITOR view, [P] or [p] tags. Default: BLACK.
+.TP
+\fBtm-id-attr\fR
+The text attribute for ARDOP ID frames printed in the TRAFFIC MONITOR view, [P] or [p] tags. Default: NORMAL.
+.TP
+\fBtm-tx-frame-attr\fR
+The text attribute for ARDOP or ARIM frames printed in the TRAFFIC MONITOR view that are sent to the TNC for transmission over the air. This can be used to distinguish outgoing from incoming frames. This attribute is ORed with any other attribute set for the frame type. Default: NORMAL.
+.TP
+\fBtc-cmd-color\fR
+The color used for commands sent by ARIM to the ARDOP TNC and printed in the TNC COMMANDS view. Default: BLACK.
+.TP
+\fBtc-cmd-attr\fR
+The text attribute for commands sent by ARIM to the ARDOP TNC and printed in the TNC COMMANDS view. This helps to distinguish outgoing commands from incoming responses. Default: NORMAL.
+.TP
+\fBtc-ptt-true-color\fR
+The color used for PTT TRUE async response sent by the ARDOP TNC and printed in the TNC COMMANDS view. Default: BLACK.
+.TP
+\fBtc-ptt-true-attr\fR
+The text attribute for PTT TRUE async responses sent by the ARDOP TNC and printed in the TNC COMMANDS view. Default: NORMAL.
+.TP
+\fBtc-ptt-false-color\fR
+The color used for PTT NORMAL async response sent by the ARDOP TNC and printed in the TNC COMMANDS view. Default: BLACK.
+.TP
+\fBtc-ptt-false-attr\fR
+The text attribute for PTT NORMAL async responses sent by the ARDOP TNC and printed in the TNC COMMANDS view. Default: NORMAL.
+.TP
+\fBtc-buffer-color\fR
+The color used for BUFFER async response sent by the ARDOP TNC and printed in the TNC COMMANDS view. Default: BLACK.
+.TP
+\fBtc-buffer-attr\fR
+The text attribute for BUFFER async responses sent by the ARDOP TNC and printed in the TNC COMMANDS view. Default: NORMAL.
+.TP
+\fBtc-ping-color\fR
+The color used for PING, PINGACK and PINGREPLY async responses sent by the ARDOP TNC and printed in the TNC COMMANDS view. Default: BLACK.
+.TP
+\fBtc-ping-attr\fR
+The text attribute for PING, PINGACK and PINGREPLY async responses sent by the ARDOP TNC and printed in the TNC COMMANDS view. Default: NORMAL.
+.TP
+\fBtc-busy-color\fR
+The color used for BUSY async response sent by the ARDOP TNC and printed in the TNC COMMANDS view. Default: BLACK.
+.TP
+\fBtc-busy-attr\fR
+The text attribute for BUSY async responses sent by the ARDOP TNC and printed in the TNC COMMANDS view. Default: NORMAL.
+.TP
+\fBtc-newstate-color\fR
+The color used for NEWSTATE async response sent by the ARDOP TNC and printed in the TNC COMMANDS view. Default: BLACK.
+.TP
+\fBtc-newstate-attr\fR
+The text attribute for NEWSTATE async responses sent by the ARDOP TNC and printed in the TNC COMMANDS view. Default: NORMAL.
+.RE
+.TE
+.SH SEE ALSO
+\fBarim\fR(1), \fI/usr/local/share/doc/arim/arim-help.pdf\fR
+

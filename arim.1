@@ -1,0 +1,36 @@
+.TH "ARIM" 1 "2021-02-20" "ARIM Messaging Program" "arim"
+.SH NAME
+ARIM \- Amateur Radio Messaging Program
+.SH "SYNOPSIS"
+\fBarim\fR [ -\fBf \fR--\fBconfig-file \fIconfig\fR ] [ -\fBh \fR--\fBhelp\fR ] [ -\fBv \fR--\fBversion\fR ]
+.SH "DESCRIPTION"
+ARIM is a messaging, file transfer and keyboard-to-keyboard chat program. It is designed to use the ARDOP (Amateur Radio Digital Open Protocol) for communication between stations.
+.SH "DOCUMENTATION"
+The full documentation is available at <https://www.whitemesa.net/arim/arim.html>
+.SH "OPTIONS"
+.TP
+-f --config-file \fIFILE\fR
+Read configuration file \fIFILE\fR on startup instead of the default \fIarim.ini\fR configuration file.
+.TP
+-p --print-conf \fIFILE\fR
+Print a listing of successfully parsed configuration file parameters to file \fIFILE\fR on startup.
+.TP
+-h --help
+Output a short summary of available command line options.
+.TP
+-v --version
+Print the version of arim, and then exit.
+.SH FILES
+For a detailed description see \fBarim\fR(5)
+.PP
+\fI${HOME}/arim/arim.ini
+.PP
+\fI${HOME}/arim/arim-themes
+.SH AUTHOR
+Robert Cunnings, NW8L <\fInw8l@whitemesa.com\fR>
+.SH COPYRIGHT
+Copyright 2016-2021 Robert Cunnings NW8L
+.PP
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>. This is free software: you are free to change and redistribute it. There is NO WARRANTY, to the extent permitted by law.
+.SH SEE ALSO
+\fBarim\fR(5), \fI/usr/local/share/doc/arim/arim-help.pdf\fR
